@@ -1,12 +1,11 @@
-
 from pysb import *
-Model ()
-
 from pysb.integrate import odesolve
-from pylab import linspace, plot, xlabel, ylabel, show
-import pylab as pl
-#from scipy.integrate import ode
+from pysb.bng import run_ssa
+import matplotlib.pyplot as plt
+import numpy as np
+from sympy import sympify
 
+Model ()
 
 #Declaring the monomers
 Monomer('s1')
@@ -45,8 +44,8 @@ Initial(s7(), Parameter('s7_0'))
 Initial(s8(), Parameter('s8_0', 1))
 Initial(s9(), Parameter('s9_0', 10000))
 Initial(s10(), Parameter('s10_0', 10))
-Initial(s11(), Parameter('s11_0', .14*2e-5))
-Initial(s12(), Parameter('s12_0', .06*2e-5))
+Initial(s11(), Parameter('s11_0', 0.14*2e-5))
+Initial(s12(), Parameter('s12_0', 0.06*2e-5))
 Initial(s13(), Parameter('s13_0', 10))
 Initial(s14(), Parameter('s14_0', 2e5))
 Initial(s15(), Parameter('s15_0'))
@@ -54,64 +53,65 @@ Initial(s16(), Parameter('s16_0', 2000))
 Initial(s17(), Parameter('s17_0'))
 Initial(s18(), Parameter('s18_0'))
 Initial(s19(), Parameter('s19_0', 1e-1))
-Initial(s20(), Parameter('s20_0', 10^5))
+Initial(s20(), Parameter('s20_0', 1e5))
 Initial(s21(), Parameter('s21_0', 1e-9))
 Initial(s22(), Parameter('s22_0', 2000))
 Initial(s23(), Parameter('s23_0', 2))
 Initial(s24(), Parameter('s24_0', 2))
 
 #Declaring parameters
-Parameter('kb', .000012)
+Parameter('kb', 0.000012)
 Parameter('kf', 1.2e-3)
 Parameter('Tdeg', 2e-4)
-Parameter('ka',2e-05)
-Parameter('Kn', 10^5)
-Parameter('ka20', 10^5)
-Parameter('ki', .01)
+Parameter('ka', 2e-05)
+Parameter('Kn', 1e5)
+Parameter('ka20', 1e5)
+Parameter('ki', 0.01)
 Parameter('B', 0)
 Parameter('KNN', 2e-05)
 Parameter('k1', 2*6e-10)
-Parameter('k3', .002)
+Parameter('k3', 0.002)
 Parameter('k2', 10000)
-Parameter('a2', 10^-7)
-Parameter('tp', .01)
+Parameter('a2', 1e-7)
+Parameter('tp', 0.01)
 Parameter('i1a', 2e-3)
 Parameter('e1a', 5e-3)
 Parameter('a3', 5e-7)
 Parameter('e2a', 5e-2)
 Parameter('a1', 5e-7)
-Parameter('i1', .01)
-Parameter('c6a', .00002)
+Parameter('i1', 0.01)
+Parameter('c6a', 0.00002)
 Parameter('kv', 5)
-Parameter('c4', .5)
-Parameter('c5', .0005)
-Parameter('c1', .01)
+Parameter('c4', 0.5)
+Parameter('c5', 0.0005)
+Parameter('c1', 0.01)
 Parameter('G', 0)
-Parameter('c3', .00075)
-Parameter('c5a', .0001)
-Parameter('k4', 10^-3)
+Parameter('c3', 0.00075)
+Parameter('c5a', 0.0001)
+Parameter('k4', 1e-3)
 Parameter('q1', 4e-7)
-Parameter('q2', 10^-6)
-Parameter('c1a', 1*.1)
+Parameter('q2', 1e-6)
+Parameter('c1a', 1*0.1)
+
+Parameter('k3_div_k2', k3.value/k2.value)
+Parameter('a1_mult_kv', a1.value*kv.value)
 
 #Declaring expression
-Expression('keff', ka*ka20/(ka20+10000))
-Expression('Exp1', k3/k2)
-Expression('Exp2', a1*kv)
-#Expression('k1', 2*k_1)
+Observable('s9_obs', s9())
+Expression('keff', sympify("ka*ka20/(ka20+s9_obs)")) #10000
 
 #Declaring rules
 Rule('s1_to_s20', s1() >> s20(), ki)
 Rule('s1_and_s2', s1() + s1() + s2() >> s1() + s1() + s3(), k1)
 Rule('s3_to_s4', s3() >> s4(), k3)
-Rule('s3_and_s9', s3() + s9() >> s9() + s4(), Exp1)
+Rule('s3_and_s9', s3() + s9() >> s9() + s4(), k3_div_k2) #Exp1)
 Rule('s4_to_s21', s4() >> s21(), k4)
 Rule('s5_deg', s5() >> None, tp)
 Rule('s6_to_s7', s6() >> s7(), tp)
 Rule('s14_to_s7', s14() >> s7(), c6a)
 Rule('s7_to_s8', s7() >> s8(), i1)
 Rule('s7_and_s11', s7() + s11() >> s14(), a1)
-Rule('s8_and_s12', s8() + s12() >> s15(), Exp2)
+Rule('s8_and_s12', s8() + s12() >> s15(), a1_mult_kv)
 Rule('s10_to_s9', s10() >> s10() + s9(), c4)
 Rule('s9_deg', s9() >> None, c5)
 Rule('s16_and_s20', s16() + s20() >> s16() + s1(), keff)
@@ -161,12 +161,7 @@ Observable(myobs, s1())
 # Observable('s22_obs', s22())
 # Observable('s23_obs', s23())
 # Observable('s24_obs', s24())
-#Observable('s8_and_s15', s8()%s15())
-
-#if __name__ == '__main__':
-    # Simulate the model through 40 seconds
-# time = linspace(0, 200, 201)
-# print "Simulating..."
+#Observable('s8_and_s15', s8()+s15())
 
 from pysb.bng import generate_equations
 
@@ -182,13 +177,25 @@ for i,ode in enumerate(model.odes):
     print i,":",ode
 
 # @TODO fix sumulation errors
-#if __name__ == '__main__':
-    # Simulate the model through 40 seconds
-    time = pl.linspace(0, 1000, 10000)
-    print "Simulating..."
-    x = odesolve(model, time, integrator='lsoda')
-    # Plot the trajectory of LR
-    plot(time, x[myobs])
-    xlabel('Time (seconds)')
-    ylabel('Amount of ' +myobs)
-    show()
+# Simulate the model 
+time = np.linspace(0, 1000, 1001)
+
+# ODE simulation
+x = odesolve(model, time, verbose=True) #integrator='lsoda', 
+plt.figure('ODE')
+plt.plot(time, x[myobs], label=myobs, lw=2)
+plt.xlabel('Time (seconds)')
+plt.ylabel('Amount of ' + myobs)
+plt.legend(loc=0)
+
+# SSA simulation
+x = run_ssa(model, time, verbose=True)
+plt.figure('SSA')
+plt.plot(time, x[myobs], label=myobs, lw=2)
+plt.xlabel('Time (seconds)')
+plt.ylabel('Amount of ' + myobs)
+plt.legend(loc=0)
+
+plt.show()
+
+
