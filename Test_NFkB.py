@@ -48,21 +48,26 @@ Initial(NFkB_c(), Parameter('NFkB_c_0'))
 Initial(NFkBn(), Parameter('NFkBn_0', 1))
 Initial(A20(), Parameter('A20_0', 10000))
 Initial(A20t(), Parameter('A20t_0', 10))
-Initial(IkBa(), Parameter('IkBa_0', 0.14*2e-5))
-Initial(IkBan(), Parameter('IkBan_0', 0.06*2e-5))
+Initial(IkBa(), Parameter('IkBa_0', 0.14*2e5))
+Initial(IkBan(), Parameter('IkBan_0', 0.06*2e5))
 Initial(IkBat(), Parameter('IkBat_0', 10))
 Initial(IkBa_NFkB(), Parameter('IkBa_NFkB_0', 2e5))
 Initial(IkBan_NFkBn(), Parameter('IkBan_NFkBn_0'))
 Initial(B(), Parameter('B_0', 2000))
 Initial(A20_gs(), Parameter('A20_gs_0'))
 Initial(IkBa_gs(), Parameter('IkBa_gs_0'))
-Initial(TNF_ext(), Parameter('TNF_ext_0', 1e-1))
+Initial(TNF_ext(), Parameter('TNF_ext_0', 0)) #1e-1
 Initial(KN(), Parameter('KN_0', 1e5))
-Initial(KNN(), Parameter('KNN_0', 1e-9))
+Initial(KNN(), Parameter('KNN_0', 2e5))
 Initial(M(), Parameter('M_0', 2000))
 Initial(AN(), Parameter('AN_0', 2))
 Initial(ANa(), Parameter('ANa_0', 2))
 
+
+# Parm = []
+# for parms in model.Parameters:
+#     Parm.append(parms)
+# Parm[18:19]= 0.1
 #Parameters for TNFa and TNFR1 activation
 # Parameter('kon', 1.83e-7) #value in M^-1*s^-1? @TODO check this value
 # Parameter('koff', 3.48e-4)
@@ -86,12 +91,12 @@ Parameter('Kn', 1e5) #total number of IKKK kinase molecules
 #Declaring Parameters
 Parameter('kb', .000012) #receptor activation rate
 Parameter('kf', 1.2e-3) #receptor inactivation rate
-Parameter('Tdeg', 2e-4) #TNF loss same as cdeg
+Parameter('Tdeg', 7.7e-4) #TNF loss same as cdeg
 Parameter('ka',2e-05) #IKKK kinase activation rate
 Parameter('ka20', 1e5) #A20 TNFR1 block
 Parameter('ki', 0.01) #IKKK kinase inactivation rate
 Parameter('AR', 0) #active receptors
-Parameter('k1', 2*6e-10) #IKKn activation by IKKK
+Parameter('k1', 6*1e-10) #IKKn activation by IKKK
 Parameter('k3', 0.002) #IKKa inactivation by A20
 Parameter('k2', 10000) #IKKa inactivation
 Parameter('k4', 1e-3) #IKKii transfer rate
@@ -99,8 +104,8 @@ Parameter('k4', 1e-3) #IKKii transfer rate
 #IkBa Parameters
 Parameter('a2', 1e-7) #IkBa phosphorylation b/c IKKa
 Parameter('tp', 0.01) #degradation of phosph-IkBa complex with NFkB
-Parameter('a3', 5e-7) #IkBa_NFkB phosphorylation b/c IKKa
-Parameter('a1', 5e-7) #IkBa*NFkB association
+Parameter('a3', 5*1e-7) #IkBa_NFkB phosphorylation b/c IKKa
+Parameter('a1', 5*1e-7) #IkBa*NFkB association
 Parameter('c6a', 0.00002) #spontaneous IkBa_NFkB defg of IkBa complex to NFkB
 Parameter('c5a', 0.0001) #IkBa deg rate
 
@@ -134,11 +139,11 @@ Expression('keff', sympify("ka*ka20/(ka20+A20_obs)")) #10000 #michaelis menten
 # Rule('IKKn7_create_IKKn8', IKKn7() >> IKKn8(), kint) #TNFR1|TNFa complex internalized
 
 #Declaring rules
-Rule('IKKKa_to_KN', IKKKa() >> KN(), ki)
-Rule('IKKKa_and_IKKn', IKKKa() + IKKKa() + IKKn() >> IKKKa() + IKKKa() + IKKa(), k1)
-Rule('IKKa_to_IKKi', IKKa() >> IKKi(), k3)
-Rule('IKKa_and_A20', IKKa() + A20() >> A20() + IKKi(), k3_div_k2) #Exp1)
-Rule('IKKi_to_KNN', IKKi() >> KNN(), k4)
+Rule('IKKKa_to_KN', IKKKa() >> KN(), ki) #IKKKa creates KN (total amount of IKKK kinase molecules)
+Rule('IKKKa_and_IKKn', IKKKa() + IKKKa() + IKKn() >> IKKKa() + IKKKa() + IKKa(), k1) #proportion of IKKKa changes IKKn to IKKa
+Rule('IKKa_to_IKKi', IKKa() >> IKKi(), k3) #IKKa active to IKKi inactive
+Rule('IKKa_and_A20', IKKa() + A20() >> A20() + IKKi(), k3_div_k2) #Exp1) #A20 mediated IKKa to IKKi
+Rule('IKKi_to_KNN', IKKi() >> KNN(), k4) #
 Rule('IkBa_p_deg', IkBa_p() >> None, tp)
 Rule('IkBapc_NFkBpc_to_NFkB_c', IkBapc_NFkBpc() >> NFkB_c(), tp)
 Rule('IkBa_NFkB_to_NFkB_c', IkBa_NFkB() >> NFkB_c(), c6a)
@@ -173,6 +178,7 @@ Observable('IKKKa_obs', IKKKa())
 Observable('IKKn_obs', IKKn())
 Observable('IKKa_obs', IKKa())
 Observable('IKKi_obs', IKKi())
+Observable('TNF_ext_obs', TNF_ext())
 Observable('IkBa_p_obs', IkBa_p())
 Observable('IkBapc_NFkBpc_obs', IkBapc_NFkBpc())
 Observable('NFkB_c_obs', NFkB_c())
@@ -186,7 +192,6 @@ Observable('IkBan_NFkBn_obs', IkBan_NFkBn())
 Observable('B_obs', B())
 Observable('A20_gs_obs', A20_gs())
 Observable('IkBa_gs_obs', IkBa_gs())
-Observable('TNF_ext_obs', TNF_ext())
 Observable('KN_obs', KN())
 Observable('KNN_obs', KNN())
 Observable('M_obs', M())
@@ -208,34 +213,83 @@ generate_equations(model, verbose=True)
 
 
 # Simulate the model 
-time = np.linspace(0, 18000, 15)
+time = np.linspace(-50, 3000, 301)
 
 # ODE simulation
-x = odesolve(model, time, verbose=True) #integrator='lsoda',
-#obs = []
-# for i in model.observables:
-#     plt.figure(1)
-#     plt.plot(time,x[i.name], label=i.name)
-#     plt.xlabel('time')
-#     plt.ylabel('# of molecules')
-# plt.legend()
-# plt.show()
+#@TODO fix array problem
+param_values = np.array([p.value for p in model.parameters])
+param_values[18]=0.1
 
-
-plt.figure('ODE')
-plt.plot(time, x['B_obs'], label=B_obs, lw=2)
-plt.xlabel('Time (seconds)')
-plt.ylabel('Amount of B_obs')
-plt.legend(loc=0)
-
-# SSA simulation
-x = run_ssa(model, time, verbose=True)
-plt.figure('SSA')
-plt.plot(time, x['B_obs'], label=B_obs, lw=2)
-plt.xlabel('Time (seconds)')
-plt.ylabel('Amount of B_obs')
-plt.legend(loc=0)
-
+x = odesolve(model, time, param_values, verbose=True) #integrator='lsoda',
+obs = []
+for myobs in model.observables[5:6]:
+    obs.append(myobs)
+    print(myobs)
+    plt.figure(1)
+    plt.plot(time,x[myobs.name], label=myobs.name)
+    # xvalues=data[0].getxdata()
+    # yvalues=data[0].getydata()
+    plt.xlabel('time')
+    plt.ylabel('Concentration')
+    plt.legend()
 plt.show()
+
+# plt.figure('ODE')
+# plt.plot(time, x['TNF_ext_obs'], label=TNF_ext_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of TNF_ext_obs')
+# plt.legend(loc=0)
+#
+# # SSA simulation
+# x = run_ssa(model, time, verbose=True)
+# plt.figure('SSA')
+# plt.plot(time, x['B_obs'], label=B_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of B_obs')
+# plt.legend(loc=0)
+#
+# plt.figure('ODE')
+# plt.plot(time, x['IKKKa_obs'], label=IKKKa_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of IKKKa_obs')
+# plt.legend(loc=0)
+#
+# # SSA simulation
+# x = run_ssa(model, time, verbose=True)
+# plt.figure('SSA')
+# plt.plot(time, x['IKKKa_obs'], label=IKKKa_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of IKKKa_obs')
+# plt.legend(loc=0)
+#
+# plt.figure('ODE')
+# plt.plot(time, x['M_obs'], label=M_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of M_obs')
+# plt.legend(loc=0)
+#
+# # SSA simulation
+# x = run_ssa(model, time, verbose=True)
+# plt.figure('SSA')
+# plt.plot(time, x['M_obs'], label=M_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of M_obs')
+# plt.legend(loc=0)
+#
+# plt.figure('ODE')
+# plt.plot(time, x['TNF_ext_obs'], label=TNF_ext_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of TNF_ext_obs')
+# plt.legend(loc=0)
+#
+# # SSA simulation
+# x = run_ssa(model, time, verbose=True)
+# plt.figure('SSA')
+# plt.plot(time, x['TNF_ext_obs'], label=TNF_ext_obs, lw=2)
+# plt.xlabel('Time (seconds)')
+# plt.ylabel('Amount of TNF_ext_obs')
+# plt.legend(loc=0)
+#
+#plt.show()
 
 
