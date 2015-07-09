@@ -225,7 +225,7 @@ generate_equations(model, verbose=True)
 #     print i,":",ode
 
 
-# Simulate the model 
+# Simulate the model
 time = np.linspace(0, 18000, 1801)
 
 # ODE simulation
