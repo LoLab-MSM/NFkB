@@ -41,8 +41,8 @@ Monomer('TNFR1i') #22
 Monomer('A20_off') #23
 Monomer('IkBa_off') #24
 
-Parameter('KNN', 2e5)
-Parameter('KN', 1e5)
+Parameter('KNN', 2.0e5)
+Parameter('KN', 1.0e5)
 Parameter('M', 2000)
 Parameter('AN', 2)
 Parameter('ANa', 2)
@@ -99,7 +99,7 @@ Parameter('kv', 5.0) #Nucealr to cytoplasm volume
 
 #Declaring Parameters
 Parameter('kb', 1.2e-5) #receptor activation rate
-Parameter('kf', 1.2e-5) #receptor inactivation rate
+Parameter('kf', .0012) #receptor inactivation rate
 Parameter('Tdeg', 7.7e-4) #TNF loss same as cdeg
 Parameter('ka',1e-5) #IKKK kinase activation rate
 Parameter('ka20', 1e5) #A20 TNFR1 block
@@ -111,7 +111,7 @@ Parameter('k2', 10000) #IKKa inactivation
 Parameter('k4', 0.001) #IKKii transfer rate
 Parameter('AA', 1.0) #IkBa on (or off)
 Parameter('c0', 0.1) # inducible A20 and IkBa mRNA synthesis
-Parameter('c1a', AA.value*c0.value) #inducible IkBa mRNA synthesis
+Parameter('c1a', 0.1) #inducible IkBa mRNA synthesis
 Parameter('AB', 1.0) #A20 (on or off)
 
 #IkBa Parameters
@@ -131,7 +131,7 @@ Parameter('i1', 0.01) #NFkB nuclear import
 #A20 and IkBa synthesis Parameters
 Parameter('c4', 0.5) #A20, IkBa transformation rate
 Parameter('c5', 0.0005) #A20 degredation rate
-Parameter('c1', AB.value*c0.value) #inducible A20 mRNA synthesis
+Parameter('c1', 0.1) #inducible A20 mRNA synthesis
 Parameter('G', 0) #initial status of A20 promoter
 Parameter('c3', 0.00075) #A20 and IkBa mRNA deg rate
 Parameter('q1', 4e-7) #NFkB attaching @ A20 and IkBa site
@@ -179,6 +179,7 @@ Rule('IkBat_deg', IkBat() >> None, c3)
 Rule('IKKa_and_IkBa_NFkB', IKKa() + IkBa_NFkB() >> IKKa() + IkBapc_NFkBpc(), a3)
 Rule('IkBan_NFkBn_to_IkBa_NFkB', IkBan_NFkBn() >> IkBa_NFkB(), e2a)
 Rule('TNFR1a_to_TNFR1i', TNFR1a() >> TNFR1i(), kf)
+
 Rule('IkBan_and_A20_on', IkBan() + A20_on() >> IkBan() + A20_off(), q2)
 Rule('IkBan_and_IkBa_on', IkBan() + IkBa_on() >> IkBan() + IkBa_off(), q2)
 Rule('TNF_ext_deg', TNF_ext() >> None, Tdeg)
@@ -189,27 +190,27 @@ Rule('NFkBn_and_IkBa_off', NFkBn() + IkBa_off() >> NFkBn() + IkBa_on(), q1)
 
 #Declaring observables
 Observable('IKKKa_obs', IKKKa()) #
-# Observable('IKKKn_obs', IKKKn())
+Observable('IKKKn_obs', IKKKn())
 Observable('IKKa_obs', IKKa()) #
 Observable('IKKi_obs', IKKi()) #
 Observable('IKKii_obs', IKKii()) #
 Observable('TNF_ext_obs', TNF_ext()) #
 Observable('IkBa_p_obs', IkBa_p()) #
 Observable('IkBapc_NFkBpc_obs', IkBapc_NFkBpc()) #
-# Observable('NFkB_c_obs', NFkB_c())
-# Observable('NFkBn_obs', NFkBn())
-# Observable('TNFR1a_obs', TNFR1a())
-# Observable('TNFR1i_obs', TNFR1i())
-# Observable('A20_off_obs', A20_off())
-# Observable('IkBa_off_obs', IkBa_off())
-# Observable('A20_on_obs', A20_on())
-# Observable('IkBa_on_obs', IkBa_on())
-# Observable('A20t_obs', A20t())
-# Observable('IkBa_obs', IkBa())
-# Observable('IkBan_obs', IkBan())
-# Observable('IkBat_obs', IkBat())
-# Observable('IkBa_NFkB_obs', IkBa_NFkB())
-# Observable('IkBan_NFkBn_obs', IkBan_NFkBn())
+Observable('NFkB_c_obs', NFkB_c())
+Observable('NFkBn_obs', NFkBn())
+Observable('TNFR1a_obs', TNFR1a())
+Observable('TNFR1i_obs', TNFR1i())
+Observable('A20_off_obs', A20_off())
+Observable('IkBa_off_obs', IkBa_off())
+Observable('A20_on_obs', A20_on())
+Observable('IkBa_on_obs', IkBa_on())
+Observable('A20t_obs', A20t())
+Observable('IkBa_obs', IkBa())
+Observable('IkBan_obs', IkBan())
+Observable('IkBat_obs', IkBat())
+Observable('IkBa_NFkB_obs', IkBa_NFkB())
+Observable('IkBan_NFkBn_obs', IkBan_NFkBn())
 Observable('IKKn_obs', IKKn()) #
 
 generate_equations(model, verbose=True)
@@ -231,46 +232,59 @@ time = np.linspace(0, 18000, 1801)
 #@TODO fix array problem
 # param_values = np.array([p.value for p in model.parameters])
 # param_values[18]=0.1
-
+plt.figure(1)
 x = odesolve(model, time, verbose=True) #integrator='lsoda',
-for obs in model.observables:#["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs", "IkBa_p_obs", "IkBan_NFkBn_obs"]:
-    plt.figure()
-    plt.plot(time/60, x[obs.name], label=obs.name, linewidth=3)
+for obs in ["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs", "IkBa_p_obs", "IkBan_NFkBn_obs"]:
+    plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
     # re.match(r"(\w+)_obs", obs).group()
     #plt.plot(time/60, x[obs.name], label=obs.name)
     plt.legend(loc=0, prop={'size': 16})
-    plt.xlabel("Time (in minutes)", fontsize=16)
-    plt.ylabel("Concentrations", fontsize=16)
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
+plt.xlabel("Time (in minutes)", fontsize=16)
+plt.ylabel("Concentrations", fontsize=16)
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
 
 # plt.figure()
 # for i in range(len(model.species)):
 #     plt.plot(time/60, x["__s%d" %i])
+plt.figure(2)
+x = odesolve(model, time, verbose=True)
+for obs in ["TNFR1a_obs", "A20_on_obs"]:
+    plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    plt.legend(loc=0, prop={'size': 16})
+plt.xlabel("Time (in minutes)", fontsize=16)
+plt.ylabel("Concentrations", fontsize=16)
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
 
-# plt.figure()
-# for obs in ["TNF_ext_obs", "TNFR1a_obs", "NFkBn_obs", "IkBa_on_obs", "A20_on_obs"]:
-#     plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-#     plt.xlabel("Time (in minutes)", fontsize=16)
-#     plt.ylabel("Concentrations", fontsize=16)
-#     plt.xticks(fontsize=10)
-#     plt.yticks(fontsize=10)
-#
-# plt.figure()
-# for obs in ["A20_obs", "A20_off_obs", "IkBa_off_obs", "IkBa_obs", "NFkBn_obs", "IkBan_obs"]:
-#     plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-#     plt.xlabel("Time (in minutes)", fontsize=16)
-#     plt.ylabel("Concentrations", fontsize=16)
-#     plt.xticks(fontsize=10)
-#     plt.yticks(fontsize=10)
+plt.figure(3)
+x = odesolve(model, time, verbose=True)
+for obs in ["A20_obs", "A20_off_obs", "IkBa_obs", "IkBan_obs"]:
+    plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    plt.legend(loc=0, prop={'size': 16})
+plt.xlabel("Time (in minutes)", fontsize=16)
+plt.ylabel("Concentrations", fontsize=16)
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
 
-# plt.figure()
-# plt.plot(time/60, x["TNF_ext_obs"], label=TNF_ext_obs)
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# plt.legend()
+x = odesolve(model, time, verbose=True)
+plt.figure(4)
+plt.plot(time/60, x["NFkBn_obs"], label=NFkBn_obs)
+plt.xlabel("Time (in minutes)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.legend()
+
+plt.figure(5)
+plt.plot(time/60, x["IkBa_off_obs"], label=IkBa_off_obs)
+plt.xlabel("Time (in minutes)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.legend()
+
+plt.figure(6)
+plt.plot(time/60, x["IkBa_on_obs"], label=IkBa_on_obs)
+plt.xlabel("Time (in minutes)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.legend()
 
 
 # # SSA simulation
