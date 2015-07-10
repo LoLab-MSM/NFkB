@@ -9,7 +9,6 @@ from pysb.macros import *
 from pysb.bng import *
 from pysb.core import *
 
-@with_model
 def test_NFkB():
     time = np.linspace(0, 18000, 1801)
     x = odesolve(model, time, verbose=True)

@@ -1,0 +1,23 @@
+language: python
+sudo: false
+python:
+ - "2.7"
+addons:
+  apt:
+    sources:
+    - libgraphviz-dev
+before_install:
+  - http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib sympy networkx nose h5py
+  - pip install -i https://pypi.binstar.org/pypi/simple pygraphviz
+  - wget http://mmbios.org/index.php/bionetgen-2-2-5-stable/bionetgen-2-2-5-stable-zip?format=raw -O BioNetGen-2.2.5-stable.zip
+  - unzip BioNetGen-2.2.5-stable.zip
+  - export BNGPATH=`pwd`/BioNetGen-2.2.5-stable
+  - git clone https://github.com/lolab-vu/pysb.git -b dev --single-branch
+  - export PYTHONPATH=$PYTHONPATH:`pwd`/pysb
+script: nosetests
