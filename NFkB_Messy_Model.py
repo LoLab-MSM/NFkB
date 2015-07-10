@@ -99,7 +99,7 @@ Parameter('kv', 5.0) #Nucealr to cytoplasm volume
 
 #Declaring Parameters
 Parameter('kb', 1.2e-5) #receptor activation rate
-Parameter('kf', .0012) #receptor inactivation rate
+Parameter('kf', 1.2e-3) #receptor inactivation rate
 Parameter('Tdeg', 7.7e-4) #TNF loss same as cdeg
 Parameter('ka',1e-5) #IKKK kinase activation rate
 Parameter('ka20', 1e5) #A20 TNFR1 block
@@ -248,7 +248,6 @@ plt.yticks(fontsize=10)
 # for i in range(len(model.species)):
 #     plt.plot(time/60, x["__s%d" %i])
 plt.figure(2)
-x = odesolve(model, time, verbose=True)
 for obs in ["TNFR1a_obs", "A20_on_obs"]:
     plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
     plt.legend(loc=0, prop={'size': 16})
@@ -258,7 +257,6 @@ plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
 
 plt.figure(3)
-x = odesolve(model, time, verbose=True)
 for obs in ["A20_obs", "A20_off_obs", "IkBa_obs", "IkBan_obs"]:
     plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
     plt.legend(loc=0, prop={'size': 16})
@@ -267,7 +265,6 @@ plt.ylabel("Concentrations", fontsize=16)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
 
-x = odesolve(model, time, verbose=True)
 plt.figure(4)
 plt.plot(time/60, x["NFkBn_obs"], label=NFkBn_obs)
 plt.xlabel("Time (in minutes)", fontsize=16)
