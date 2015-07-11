@@ -105,7 +105,7 @@ Parameter('ka',1e-5) #IKKK kinase activation rate
 Parameter('ka20', 1e5) #A20 TNFR1 block
 Parameter('ki', 0.01) #IKKK kinase inactivation rate
 Parameter('AR', 0) #active receptors
-Parameter('k1', 2.0*6e-10) #IKKn activation by IKKK
+Parameter('k1', 2*6e-10) #IKKn activation by IKKK
 Parameter('k3', 0.002) #IKKa inactivation by A20
 Parameter('k2', 10000) #IKKa inactivation
 Parameter('k4', 0.001) #IKKii transfer rate
