@@ -7,6 +7,7 @@ from scipy.integrate import ode
 from Model import dy
 
 
+
 #initial conditions
 TNF_dose = 0.1 # TNF dose
 Ana = 2 #IkBa alleles
