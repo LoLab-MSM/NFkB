@@ -27,7 +27,7 @@ Parameter('AN', 2)
 Parameter('ANa', 2)
 
 #Declaring initial conditions
-# @TODO FIGURE OUT INITIAL CONDITION PROBLEM
+# @TODO FIGURE OUT INITIAL CONDITION
 Initial(IKKK(state = 'a'), Parameter('IKKKa_0'))
 Initial(IKK(state = 'n'), Parameter('IKKn_0', 2e5))
 Initial(IKK(state = 'a'), Parameter('IKKa_0'))
