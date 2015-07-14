@@ -2,8 +2,9 @@
                                                               
 Function includes system of ODEs describing       
 NF-kB regulatory pathway.                         
-Present molecules are coded as follows:           
-                                                 
+
+## Species
+```
 y(1)   IKKKa active                               
 y(2)   IKKn   neutral                                 
 y(3)   IKKa   active                              
@@ -22,20 +23,26 @@ y(15)  (IkBan|NFkBn) nuclear
 y(16)  Active receptors                           
 y(17)  A20 gene state                                   
 y(18)  IkBa gene state                            
-y(19)  extracellular TNF                           
+y(19)  extracellular TNF
+```
 
-#added ODEs for model
+## Added species
+```
 y(20) total # IKKK kinase molecules (KN)
 y(21) total # IKK kinase molecules (KNN)
 y(22) average number active receptors (M)
 y(23) A20 alleles (AN)
 y(24) IkBa alleles (Ana)
+```
 
-     
-#ODEs not used in model
+## Removed species
+```
 y(20) Reporter gene state                         
-y(21) Reporter transcript                         
+y(21) Reporter transcript
+```
 
+## ODEs and parameter list
+```
 function dy=ModelD(t,y,Ga,G,M,AN,ANa,ANR)
 
 [NF0,NF1,NF2,M0,M1,M2,k4,ka20,AB,kv,q1,q2,c1,c3,c4,c5,k1,k2,k3,a1,a2,a3,c1a,c5a,c6a,i1,i1a,e1a,e2a,dt,tp,KN,KNN,ka,ki,kb,kf,Tdeg,q1r,q2r,q2rr,c1r,c1rr,c3r]=ParametersD
@@ -158,3 +165,4 @@ dy(23)=-q1*y(8)*y(23) + q2*y(12)*y(17)
 
 dy(24)=q1*y(8)*y(24) + q2*y(12)*y(18)
 #IkBa alleles (Ana)
+```
