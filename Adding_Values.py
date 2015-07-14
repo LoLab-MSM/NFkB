@@ -6,6 +6,7 @@ from pysb.macros import *
 from pysb.bng import *
 from pysb.core import *
 from sympy import sympify
+from pysb.bng import *
 
 Model ()
 
@@ -14,9 +15,11 @@ Monomer('TNF_ext')
 Monomer('TNFR1', ['state'], {'state': ['i', 'a']})
 Monomer('IKKK', ['state'], {'state': ['i', 'a', 'n']})
 Monomer('IKK', ['state'], {'state': ['n', 'a', 'i', 'ii']})
-Monomer('IkBa', ['b', 'phos', 'loc', 'state'], {'phos': ['u', 'p'], 'loc': ['nuc', 'cyt'], 'state': ['on', 'off']})
-Monomer('NFkB', ['b', 'phos', 'loc'], {'phos': ['u', 'p'], 'loc': ['nuc', 'cyt']})
-Monomer('A20', ['state'], {'state': ['on', 'off', 'a']})
+Monomer('IkBa', ['b', 'phos', 'loc'], {'phos': ['u', 'p'], 'loc': ['n', 'c']})
+Monomer('NFkB', ['b', 'phos', 'loc'], {'phos': ['u', 'p'], 'loc': ['n', 'c']})
+Monomer('A20_gene', ['state'], {'state': ['on', 'off']})
+Monomer('IkBa_gene', ['state'], {'state': ['on', 'off']})
+Monomer('A20')
 Monomer('IkBa_mRNA')
 Monomer('A20_mRNA')
 
@@ -32,30 +35,29 @@ Initial(IKKK(state = 'a'), Parameter('IKKKa_0'))
 Initial(IKK(state = 'n'), Parameter('IKKn_0', 2e5))
 Initial(IKK(state = 'a'), Parameter('IKKa_0'))
 Initial(IKK(state = 'i'), Parameter('IKKi_0'))
-Initial(NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c', state = 'off'), Parameter('IkBapc_NFkBpc_0'))
+Initial(IkBa(b = None, phos = 'p', loc = 'c'), Parameter('IkBa_p_0'))
+Initial(NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c'), Parameter('IkBapc_NFkBpc_0'))
 Initial(NFkB(b = None, phos = 'u', loc = 'c'), Parameter('NFkB_c_0'))
 Initial(NFkB(b = None, phos = 'u', loc = 'n'), Parameter('NFkBn_0', 1))
-Initial(A20(state = 'a'), Parameter('A20_0', 10000))
+Initial(A20(), Parameter('A20_0', 10000))
 Initial(A20_mRNA(), Parameter('A20t_0', 10))
-Initial(IkBa(b = None, phos = 'u', loc = 'c', state = 'off'), Parameter('IkBa_0', 0.14*100000))
-Initial(IkBa(b = None, phos = 'u', loc = 'n', state = 'off'), Parameter('IkBan_0', 0.06*100000))
+Initial(IkBa(b = None, phos = 'u', loc = 'c'), Parameter('IkBa_0', 0.14*100000))
+Initial(IkBa(b = None, phos = 'u', loc = 'n'), Parameter('IkBan_0', 0.06*100000))
 Initial(IkBa_mRNA(), Parameter('IkBat_0', 10))
-Initial(NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c', state = 'off'), Parameter('IkBa_NFkB_0', 100000))
-Initial(NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n', state = 'off'), Parameter('IkBan_NFkBn_0'))
+Initial(NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'), Parameter('IkBa_NFkB_0', 100000))
+Initial(NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n'), Parameter('IkBan_NFkBn_0'))
 Initial(TNFR1(state = 'a'), Parameter('TNFR1a_0'))
-Initial(A20(state = 'on'), Parameter('A20_on_0'))
-Initial(IkBa(b = None, phos = 'u', loc = 'n', state = 'on'), Parameter('IkBa_on_0'))
+Initial(A20_gene(state = 'on'), Parameter('A20_on_0'))
+Initial(IkBa_gene(state = 'on'), Parameter('IkBa_on_0'))
 Initial(TNF_ext(), Parameter('TNF_ext_0', 0.1)) #1e-1
 Initial(IKKK(state = 'n'), Parameter('IKKKn_0', KN.value))
 Initial(IKK(state = 'ii'), Parameter('IKKii_0', KNN.value-IKKn_0.value))
 Initial(TNFR1(state = 'i'), Parameter('TNFR1i_0', M.value))
-Initial(A20(state = 'off'), Parameter('A20_off_0', AN.value))
-Initial(IkBa(b = None, phos = 'u', loc = 'n', state = 'off'), Parameter('ANa_0', ANa.value))
+Initial(A20_gene(state = 'off'), Parameter('A20_off_0', AN.value))
+Initial(IkBa_gene(state = 'off'), Parameter('ANa_0', ANa.value))
 
 #Cell Parameters
 Parameter('kv', 5.0) #Nucealr to cytoplasm volume
-#Parameter('Kn', 1e5) #total number of IKKK kinase molecules
-#Parameter('K_nn', 2e-05) #total number of IKK kinase molecules
 
 #Declaring Parameters
 Parameter('kb', 1.2e-5) #receptor activation rate
@@ -100,14 +102,13 @@ Parameter('q2', 1e-6) #IkBa inducible detaching from A20, IkBa site
 Parameter('k3_div_k2', k3.value/k2.value) #for IKKa and A20
 Parameter('a1_mult_kv', a1.value*kv.value) #for volume IkBa association NFkB
 
-
 #Declaring expression
 Observable('A20_obs', A20())
 Expression('keff', sympify("ka*ka20/(ka20+A20_obs)")) #10000 #michaelis menten
 
 #TNFa binding to TNFR1
 # Rule('TNF_ext_and_TNFR1i', TNF_ext() + TNFR1i() >> TNF_ext() + TNFR1a(), kb)
-Rule('test', TNF_ext() + TNFR1(state = 'i') >> TNF_ext() + TNFR1(state = 'a'), kb)
+Rule('TNF_activate_TNFR1', TNF_ext() + TNFR1(state = 'i') >> TNF_ext() + TNFR1(state = 'a'), kb)
 # Rule('TNF_ext_and_TNFR1i', TNF_ext(b = None) + TNFR1(b = None, state = 'i') >> TNF_ext(b = 1) % TNFR1(b = 1, state = 'i'), kb)
 # Rule('activate_TNFR1', TNF_ext(b = 1) % TNFR1(b = 1, state = 'i') >> TNF_ext(b = 1) % TNFR1(b = None, state = 'a'), kb)
 # catalyze_state(TNF_ext(), 'b', TNFR1(state = 'i'), 'b', TNFR1(state = 'a'), kb) #using macros
@@ -137,7 +138,7 @@ Rule('IKKa_to_IKKi', IKK(state = 'a') >> IKK(state = 'i'), k3)
 
 #A20 inactivating IKK
 # Rule('IKKa_and_A20', IKKa() + A20() >> A20() + IKKi(), k3_div_k2)
-Rule('IKKa_and_A20', IKK(state = 'a') + A20(state = 'a') >> A20(state = 'a') + IKK(state = 'i'), k3_div_k2) #Exp1) #A20 mediated IKKa to IKKi
+Rule('IKKa_and_A20', IKK(state = 'a') + A20() >> A20() + IKK(state = 'i'), k3_div_k2) #Exp1) #A20 mediated IKKa to IKKi
 
 #inactive IKK inactivates immediate IKK
 # Rule('IKKi_to_IKKii', IKKi() >> IKKii(), k4)
@@ -149,11 +150,11 @@ Rule('TNF_ext_deg', TNF_ext() >> None, Tdeg)
 
 #degredation of phos IkBa
 # Rule('IkBa_p_deg', IkBa_p() >> None, tp)
-Rule('IkBa_p_deg', IkBa(b = None, phos = 'p', loc = 'c', state = 'off') >> None, tp)
+Rule('IkBa_p_deg', IkBa(b = None, phos = 'p', loc = 'c') >> None, tp)
 
-#degrade A20 @TODO question about A20!
+#degrade A20
 # Rule('A20_deg', A20() >> None, c5)
-Rule('A20_deg', A20(state = 'a') >> None, c5)
+Rule('A20_deg', A20() >> None, c5)
 
 #degrade A20t
 # Rule('A20t_deg', A20t() >> None, c3)
@@ -161,7 +162,7 @@ Rule('A20_mRNA_deg', A20_mRNA() >> None, c3)
 
 #IkBa cyto degredation
 # Rule('IkBa_cyt_deg', IkBac() >> None, c5a)
-Rule('IkBa_cyt_deg', IkBa(b = None, phos = 'u', loc = 'c', state = 'off') >> None, c5a)
+Rule('IkBa_cyt_deg', IkBa(b = None, phos = 'u', loc = 'c') >> None, c5a)
 
 #degredation of IkBa_mRNA
 # Rule('IkBat_deg', IkBat() >> None, c3)
@@ -169,11 +170,11 @@ Rule('IkBa_mRNA_deg', IkBa_mRNA() >> None, c3)
 
 #IkBa|NFkB phos complex cyto to free NFkB in cyto
 # Rule('IkBapc_NFkBpc_to_NFkB_c', IkBapc_NFkBpc() >> NFkB_c(), tp)
-Rule('IkBapc_NFkBpc_to_NFkB_c', NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c', state = 'off') >> NFkB(b = None, phos = 'u', loc = 'c'), tp)
+Rule('IkBapc_NFkBpc_to_NFkB_c', NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c') >> NFkB(b = None, phos = 'u', loc = 'c'), tp)
 
 #release of NFkB in cyto
 # Rule('IkBac_NFkBc_to_NFkB_c', IkBac_NFkBc() >> NFkB_c(), c6a)
-Rule('IkBa_NFkB_to_NFkB_c', NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c', state = 'off') >> NFkB(b = None, phos = 'u', loc = 'c'), c6a)
+Rule('IkBa_NFkB_to_NFkB_c', NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c') >> NFkB(b = None, phos = 'u', loc = 'c'), c6a)
 
 #Transport of NFkB from cyto to nuc
 # Rule('NFkB_c_to_NFkBn', NFkB_c() >> NFkBn(), i1)
@@ -181,55 +182,55 @@ Rule('NFkB_c_to_NFkBn', NFkB(b = None, phos = 'u', loc = 'c') >> NFkB(b = None, 
 
 #NFkB in cyto and IkBa in cyto create bind in cyto
 # Rule('NFkB_c_and_IkBa', NFkB_c() + IkBa() >> IkBa_NFkB(), a1)
-Rule('NFkB_c_and_IkBa', NFkB(b = None, phos = 'u', loc = 'c') + IkBa(b = None, phos = 'u', loc = 'c', state = 'off') >> NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c', state = 'off') , a1)
+Rule('NFkB_c_and_IkBa', NFkB(b = None, phos = 'u', loc = 'c') + IkBa(b = None, phos = 'u', loc = 'c') >> NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c') , a1)
 
 #NFkBn and IkBan create IkBan|NFkBn complex in nucleus
 # Rule('NFkBn_and_IkBan', NFkBn() + IkBan() >> IkBan_NFkBn(), a1_mult_kv)
-Rule('NFkBn_and_IkBan', NFkB(b = None, phos = 'u', loc = 'n') + IkBa(b = None, phos = 'u', loc = 'n', state = 'off') >> NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n', state = 'off'), a1_mult_kv)
+Rule('NFkBn_and_IkBan', NFkB(b = None, phos = 'u', loc = 'n') + IkBa(b = None, phos = 'u', loc = 'n') >> NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n'), a1_mult_kv)
 
 #IKKa creates IkBa|NFkB phos complex in cyto
 # Rule('IKKa_and_IkBa_NFkB', IKKa() + IkBac_NFkBc() >> IKKa() + IkBapc_NFkBpc(), a3)
-Rule('IKKa_and_IkBa_NFkB', IKK(state = 'a') + NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c', state = 'off') >> IKK(state = 'a') + NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c', state = 'off'), a3)
+Rule('IKKa_and_IkBa_NFkB', IKK(state = 'a') + NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c') >> IKK(state = 'a') + NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c'), a3)
 
 #A20 translation
 # Rule('A20_mRNA_to_A20', A20_mRNA() >> A20_mRNA() + A20(), c4)
-Rule('A20_mRNA_to_A20', A20_mRNA() >> A20_mRNA() + A20(state = 'a'), c4)
+Rule('A20_mRNA_to_A20', A20_mRNA() >> A20_mRNA() + A20(), c4)
 
 #A20 transcription
 # Rule('A20_on_to_A20_mRNA', A20_on() >> A20_on() + A20_mRNA(), c1)
-Rule('A20_on_to_A20_mRNA', A20(state = 'on') >> A20(state ='on') + A20_mRNA(), c1)
+Rule('A20_gene_to_A20_mRNA', A20_gene(state = 'on') >> A20_gene(state ='on') + A20_mRNA(), c1)
 
 #IKKa phos IkBa
 # Rule('IKKa_and_IkBa', IKKa() + IkBa() >> IKKa() + IkBa_p(), a2)
-Rule('IKKa_and_IkBap', IKK(state = 'a') + IkBa(b = None, phos = 'u', loc = 'c', state = 'off') >> IKK(state  = 'a') + IkBa(b = None, phos = 'p', loc = 'c', state = 'off'), a2)
+Rule('IKKa_and_IkBap', IKK(state = 'a') + IkBa(b = None, phos = 'u', loc = 'c') >> IKK(state  = 'a') + IkBa(b = None, phos = 'p', loc = 'c'), a2)
 
-#IkBa translation
+#IkBa translation @TODO is this one correct?
 # Rule('IkBa_mRNA_to_IkBan', IkBa_mRNA() >> IkBa_mRNA() + IkBan(), c4)
-Rule('IkBa_mRNA_to_IkBan', IkBa_mRNA() >> IkBa_mRNA() + IkBa(b = None, phos = 'u', loc = 'n', state = 'off'), c4)
+Rule('IkBa_mRNA_to_IkBa', IkBa_mRNA() >> IkBa_mRNA() + IkBa(b = None, phos = 'u', loc = 'c'), c4)
 
 #IkBa cyto to nuc
 # Rule('IkBac_to_IkBan', IkBac() >> IkBan(), i1a)
-Rule('IkBac_to_IkBan', IkBa(b = None, phos = 'u', loc = 'c', state = 'off') >> IkBa(b = None, phos = 'u', loc = 'n', state = 'off'), i1a)
+Rule('IkBac_to_IkBan', IkBa(b = None, phos = 'u', loc = 'c') >> IkBa(b = None, phos = 'u', loc = 'n'), i1a)
 
 #IkBa nuc to cyto
 # Rule('IkBan_to_IkBac', IkBan() >> IkBac(), e1a)
-Rule('IkBan_to_IkBac', IkBa(b = None, phos = 'u', loc = 'n', state = 'off') >> IkBa(b = None, phos = 'u', loc = 'c', state = 'off'), e1a)
+Rule('IkBan_to_IkBac', IkBa(b = None, phos = 'u', loc = 'n') >> IkBa(b = None, phos = 'u', loc = 'c'), e1a)
 
 #IkBa Transcription
 # Rule('IkBa_on_to_IkBat', IkBa_on() >> IkBa_on() + IkBat(), c1a)
-Rule('IkBa_on_to_IkBat', IkBa(b = None, phos = 'u', loc = 'n', state = 'on') >> IkBa(b = None, phos = 'u', loc = 'n', state = 'on') + IkBa_mRNA(), c1a)
+Rule('IkBa_on_to_IkBat', IkBa_gene(state = 'on') >> IkBa_gene(state = 'on') + IkBa_mRNA(), c1a)
 
 #IkBa\NFkB from nuc to cyto
 # Rule('IkBan_NFkBn_to_IkBac_NFkBc', IkBan_NFkBn() >> IkBac_NFkBc(), e2a)
-Rule('IkBan_NFkBn_to_IkBac_NFkBc', NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n', state = 'off') >> NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c', state = 'off'), e2a)
+Rule('IkBan_NFkBn_to_IkBac_NFkBc', NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n') >> NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'), e2a)
 
 #turning off A20 gene state
 # Rule('IkBan_and_A20_on', IkBan() + A20_on() >> IkBan() + A20_off(), q2)
-Rule('IkBan_and_A20_on', IkBa(b = None, phos = 'u', loc = 'n', state = 'off') + A20(state = 'on') >> IkBa(b = None, phos = 'u', loc = 'n', state = 'off') + A20(state = 'off'), q2)
+Rule('IkBan_and_A20_on', IkBa(b = None, phos = 'u', loc = 'n') + A20_gene(state = 'on') >> IkBa(b = None, phos = 'u', loc = 'n') + A20_gene(state = 'off'), q2)
 
 #turning off IkBa gene state
 # Rule('IkBan_and_IkBa_on', IkBan() + IkBa_on() >> IkBan() + IkBa_off(), q2)
-Rule('IkBan_and_IkBa_on', IkBa(b = None, phos = 'u', loc = 'n', state = 'off') + IkBa(b = None, phos = 'u', loc = 'n', state = 'on') >> IkBa(b = None, phos = 'u', loc = 'n', state = 'off') + IkBa(b = None, phos = 'u', loc = 'n', state = 'off'), q2)
+Rule('IkBan_and_IkBa_on', IkBa(b = None, phos = 'u', loc = 'n') + IkBa_gene(state = 'on') >> IkBa(b = None, phos = 'u', loc = 'n') + IkBa_gene(state = 'off'), q2)
 
 #IKKii creates IKKn
 # Rule('IKKii_to_IKKn', IKKii() >> IKKn(), k4)
@@ -237,12 +238,55 @@ Rule('IKKii_to_IKKn', IKK(state = 'ii') >> IKK(state = 'n'), k4)
 
 #NFkB turning off A20 gene state
 # Rule('NFkBn_and_A20_off', NFkBn() + A20_off() >> NFkBn() + A20_on(), q1)
-Rule('NFkBn_and_A20_off', NFkB(b = None, phos = 'u', loc = 'n') + A20(state = 'off') >> NFkB(b = None, phos = 'u', loc = 'n') + A20(state = 'on'), q1)
+Rule('NFkBn_and_A20_off', NFkB(b = None, phos = 'u', loc = 'n') + A20_gene(state = 'off') >> NFkB(b = None, phos = 'u', loc = 'n') + A20_gene(state = 'on'), q1)
 
 #NFkB turning off IkBa gene state
 # Rule('NFkBn_and_IkBa_off', NFkBn() + IkBa_off() >> NFkBn() + IkBa_on(), q1)
-Rule('NFkBn_and_IkBa_off', NFkB(b = None, phos = 'u', loc = 'n') + IkBa(b = None, phos = 'u', loc = 'n', state = 'off') >> NFkB(b = None, phos = 'u', loc = 'n') + IkBa(b = None, phos = 'u', loc = 'n', state = 'on'), q1)
+Rule('NFkBn_and_IkBa_off', NFkB(b = None, phos = 'u', loc = 'n') + IkBa_gene(state = 'off') >> NFkB(b = None, phos = 'u', loc = 'n') + IkBa_gene(state = 'on'), q1)
 
 
+# Initial(A20(), Parameter('A20_0', 10000))
+# Initial(A20_mRNA(), Parameter('A20t_0', 10))
+# Initial(IkBa(b = None, phos = 'u', loc = 'c'), Parameter('IkBa_0', 0.14*100000))
+# Initial(IkBa(b = None, phos = 'u', loc = 'n'), Parameter('IkBan_0', 0.06*100000))
+# Initial(IkBa_mRNA(), Parameter('IkBat_0', 10))
+# Initial(NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'), Parameter('IkBa_NFkB_0', 100000))
+# Initial(NFkB(b = 1, phos = 'u', loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n'), Parameter('IkBan_NFkBn_0'))
+# Initial(TNFR1(state = 'a'), Parameter('TNFR1a_0'))
+# Initial(A20_gene(state = 'on'), Parameter('A20_on_0'))
+# Initial(IkBa_gene(state = 'on'), Parameter('IkBa_on_0'))
+# Initial(TNF_ext(), Parameter('TNF_ext_0', 0.1)) #1e-1
+# Initial(IKKK(state = 'n'), Parameter('IKKKn_0', KN.value))
+# Initial(IKK(state = 'ii'), Parameter('IKKii_0', KNN.value-IKKn_0.value))
+# Initial(TNFR1(state = 'i'), Parameter('TNFR1i_0', M.value))
+# Initial(A20_gene(state = 'off'), Parameter('A20_off_0', AN.value))
+# Initial(IkBa_gene(state = 'off'), Parameter('ANa_0', ANa.value))
+#
+# #Declaring observables
+# Observable('IKKKa_obs', IKKK(state = 'a'))
+# Observable('IKKKn_obs', IKK(state = 'n'))
+# Observable('IKKa_obs', IKK(state = 'a'))
+# Observable('IKKi_obs', IKK(state = 'i'))
+# Observable('IKKii_obs', IKK(state = 'ii'))
+# Observable('TNF_ext_obs', TNF_ext())
+# Observable('IkBa_p_obs', IkBa(b = None, phos = 'p', loc = 'c'))
+# Observable('IkBapc_NFkBpc_obs', NFkB(b = 1, phos = 'p', loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c'))
+# Observable('NFkB_c_obs', NFkB(b = None, phos = 'u', loc = 'c'))
+# Observable('NFkBn_obs', NFkB(b = None, phos = 'u', loc = 'n'))
+# Observable('TNFR1a_obs', TNFR1a())
+# Observable('TNFR1i_obs', TNFR1i())
+# Observable('A20_off_obs', A20_off())
+# Observable('IkBa_off_obs', IkBa_off())
+# Observable('A20_on_obs', A20_on())
+# Observable('IkBa_on_obs', IkBa_on())
+# Observable('A20t_obs', A20t())
+# Observable('IkBa_obs', IkBa())
+# Observable('IkBan_obs', IkBan())
+# Observable('IkBat_obs', IkBat())
+# Observable('IkBa_NFkB_obs', IkBa_NFkB())
+# Observable('IkBan_NFkBn_obs', IkBan_NFkBn())
+# Observable('IKKn_obs', IKKn())
+
+generate_equations(model, verbose = True)
 for i,ode in enumerate(model.odes):
     print i,":",ode

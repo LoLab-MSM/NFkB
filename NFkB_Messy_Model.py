@@ -213,13 +213,17 @@ Observable('IkBa_NFkB_obs', IkBa_NFkB())
 Observable('IkBan_NFkBn_obs', IkBan_NFkBn())
 Observable('IKKn_obs', IKKn()) #
 
-#generate_equations(model, verbose=True)
+generate_equations(model, verbose=True)
+odes_unstruct = [(i,":",odes)for i,odes in enumerate(model.odes)]
 
-# for i,sp in enumerate(model.species):
-#     print i,":",sp
-# print
-# for i,rxn in enumerate(model.reactions):
-#     print i,":",rxn
-# print
+#
+# # for i,sp in enumerate(model.species):
+# #     print i,":",sp
+# # print
+# # for i,rxn in enumerate(model.reactions):
+# #     print i,":",rxn
+# # print
+# myodes = []
 # for i,ode in enumerate(model.odes):
-#     print i,":",ode
+#     myodes.append(i, odes)
+# #     print myodes # i,":",ode
