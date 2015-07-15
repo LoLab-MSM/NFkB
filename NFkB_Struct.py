@@ -35,13 +35,13 @@ Parameter('ANa', 2)
 
 #Declaring initial conditions
 Initial(IKK(state = 'n'), Parameter('IKKn_0', 2e5))
-Initial(NFkB(b = None, phos = 'u', loc = 'n'), Parameter('NFkBn_0', 1))
+Initial(NFkB(b = None, loc = 'n'), Parameter('NFkBn_0', 1))
 Initial(A20(), Parameter('A20_0', 10000))
 Initial(A20_mRNA(), Parameter('A20t_0', 10))
 Initial(IkBa(b = None, phos = 'u', loc = 'c'), Parameter('IkBa_0', 0.14*100000))
 Initial(IkBa(b = None, phos = 'u', loc = 'n'), Parameter('IkBan_0', 0.06*100000))
 Initial(IkBa_mRNA(), Parameter('IkBat_0', 10))
-Initial(NFkB(b = 1, phos = 'u', loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'), Parameter('IkBa_NFkB_0', 100000))
+Initial(NFkB(b = 1, loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'), Parameter('IkBa_NFkB_0', 100000))
 Initial(TNF_ext(), Parameter('TNF_ext_0', 0.1)) #1e-1
 Initial(IKKK(state = 'n'), Parameter('IKKKn_0', KN.value))
 Initial(IKK(state = 'ii'), Parameter('IKKii_0', KNN.value-IKKn_0.value))
@@ -96,7 +96,41 @@ Parameter('k3_div_k2', k3.value/k2.value) #for IKKa and A20
 Parameter('a1_mult_kv', a1.value*kv.value) #for volume IkBa association NFkB
 
 #Declaring observables
+Observable('IKKKa_obs', IKKK(state = 'a'))
+Observable('IKKKn_obs', IKK(state = 'n'))
+Observable('IKKa_obs', IKK(state = 'a'))
+Observable('IKKi_obs', IKK(state = 'i'))
+Observable('IKKii_obs', IKK(state = 'ii'))
+Observable('TNF_ext_obs', TNF_ext())
+Observable('IkBa_p_obs', IkBa(b = None, phos = 'p', loc = 'c'))
+Observable('IkBan_NFkBn_obs', NFkB(b = 1,loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n'))
+# Observable('NFkB_c_obs', NFkB(b = None, loc = 'c'))
+# Observable('NFkBn_obs', NFkB(b = None, loc = 'n'))
+#
 Observable('A20_obs', A20())
+# Observable('IKKKa_obs', IKKKa()) #
+# Observable('IKKKn_obs', IKKKn())
+# Observable('IKKa_obs', IKKa()) #
+# Observable('IKKi_obs', IKKi()) #
+# Observable('IKKii_obs', IKKii()) #
+# Observable('TNF_ext_obs', TNF_ext()) #
+# Observable('IkBa_p_obs', IkBa_p()) #
+# Observable('IkBapc_NFkBpc_obs', IkBapc_NFkBpc()) #
+# Observable('NFkB_c_obs', NFkB_c())
+# Observable('NFkBn_obs', NFkBn())
+# Observable('TNFR1a_obs', TNFR1a())
+# Observable('TNFR1i_obs', TNFR1i())
+# Observable('A20_off_obs', A20_off())
+# Observable('IkBa_off_obs', IkBa_off())
+# Observable('A20_on_obs', A20_on())
+# Observable('IkBa_on_obs', IkBa_on())
+# Observable('A20t_obs', A20t())
+# Observable('IkBa_obs', IkBa())
+# Observable('IkBan_obs', IkBan())
+# Observable('IkBat_obs', IkBat())
+# Observable('IkBa_NFkB_obs', IkBa_NFkB())
+# Observable('IkBan_NFkBn_obs', IkBan_NFkBn())
+# Observable('IKKn_obs', IKKn()) #
 
 #Declaring expression
 Expression('keff', sympify("ka*ka20/(ka20+A20_obs)")) #10000 #michaelis menten
@@ -145,11 +179,11 @@ Rule('TNF_ext_deg', TNF_ext() >> None, Tdeg)
 
 #IkBa|NFkB phos complex cyto to free NFkB in cyto
 # Rule('IkBapc_NFkBpc_to_NFkB_c', IkBapc_NFkBpc() >> NFkB_c(), tp)
-#Rule('IkBapc_NFkBpc_to_NFkB_c', IkBa(b = 1, phos = 'p', loc = 'c') % NFkB(b = 1,  loc = 'c') >> NFkB(b = None, loc = 'c'), tp)
+Rule('IkBapc_NFkBpc_to_NFkB_c', IkBa(b = 1, phos = 'p', loc = 'c') % NFkB(b = 1,  loc = 'c') >> NFkB(b = None, loc = 'c'), tp)
 
 #degredation of phos IkBa
 # Rule('IkBa_p_deg', IkBa_p() >> None, tp)
-Rule('IkBa_p_deg', IkBa(phos = 'p', loc = 'c') >> None, tp)
+Rule('IkBa_p_deg', IkBa(b = None, phos = 'p', loc = 'c') >> None, tp)
 
 #degrade A20
 # Rule('A20_deg', A20() >> None, c5)
@@ -243,17 +277,17 @@ Rule('NFkBn_and_IkBa_off', NFkB(b = None, loc = 'n') + IkBa_gene(state = 'off') 
 
 
 generate_equations(model, verbose = True)
-for i,sp in enumerate(model.species):
-    print i,":",sp
+# for i,sp in enumerate(model.species):
+#     print i,":",sp
 # for i,ode in enumerate(model.odes):
 #     print i,":",ode
 
 # time = np.linspace(0, 18000, 1801)
-#
-# # ODE simulation
-# # param_values = np.array([p.value for p in model.parameters])
-# # param_values[18]=0.1
-# plt.figure(1)
+# #
+# # # ODE simulation
+# # # param_values = np.array([p.value for p in model.parameters])
+# # # param_values[18]=0.1
+# plt.figure('Struct')
 # x = odesolve(model, time, verbose=True) #integrator='lsoda',
 # for obs in ["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs", "IkBa_p_obs", "IkBan_NFkBn_obs"]:
 #     plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
