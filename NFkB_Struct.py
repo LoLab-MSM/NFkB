@@ -34,7 +34,13 @@ Parameter('AN', 2)
 Parameter('ANa', 2)
 
 #Declaring initial conditions
+Initial(IKKK(state = 'a'), Parameter('IKKKa_0'))
 Initial(IKK(state = 'n'), Parameter('IKKn_0', 2e5))
+Initial(IKK(state = 'a'), Parameter('IKKa_0'))
+Initial(IKK(state = 'i'), Parameter('IKKi_0'))
+Initial(IkBa(b = None, phos = 'p', loc = 'c'), Parameter('IkBap_0'))
+Initial(NFkB(b = 1, loc = 'c') % IkBa(b = 1, phos = 'p', loc = 'c'), Parameter('IkBap_NFkB'))
+Initial(NFkB(b = None, loc = 'c'), Parameter('NFkBc'))
 Initial(NFkB(b = None, loc = 'n'), Parameter('NFkBn_0', 1))
 Initial(A20(), Parameter('A20_0', 10000))
 Initial(A20_mRNA(), Parameter('A20t_0', 10))
@@ -42,12 +48,17 @@ Initial(IkBa(b = None, phos = 'u', loc = 'c'), Parameter('IkBa_0', 0.14*100000))
 Initial(IkBa(b = None, phos = 'u', loc = 'n'), Parameter('IkBan_0', 0.06*100000))
 Initial(IkBa_mRNA(), Parameter('IkBat_0', 10))
 Initial(NFkB(b = 1, loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'), Parameter('IkBa_NFkB_0', 100000))
-Initial(TNF_ext(), Parameter('TNF_ext_0', 0.1)) #1e-1
+Initial(NFkB(b = 1, loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n'), Parameter('IkBan_NFkBn'))
+Initial(TNFR1(state = 'a'), Parameter('TNFR1a'))
+Initial(A20_gene(state = 'on'), Parameter('A20_on_0'))
+Initial(IkBa_gene(state = 'on'), Parameter('IkBa_on_0'))
+Initial(TNF_ext(), Parameter('TNF_ext_0', 0.1))
 Initial(IKKK(state = 'n'), Parameter('IKKKn_0', KN.value))
-Initial(IKK(state = 'ii'), Parameter('IKKii_0', KNN.value-IKKn_0.value))
+Initial(IKK(state = 'ii'), Parameter('IKKii'))
 Initial(TNFR1(state = 'i'), Parameter('TNFR1i_0', M.value))
 Initial(A20_gene(state = 'off'), Parameter('A20_off_0', AN.value))
 Initial(IkBa_gene(state = 'off'), Parameter('ANa_0', ANa.value))
+
 
 #Cell Parameters
 Parameter('kv', 5.0) #Nucealr to cytoplasm volume
@@ -59,15 +70,11 @@ Parameter('Tdeg', 7.7e-4) #TNF loss same as cdeg
 Parameter('ka',1e-5) #IKKK kinase activation rate
 Parameter('ka20', 1e5) #A20 TNFR1 block
 Parameter('ki', 0.01) #IKKK kinase inactivation rate
-Parameter('AR', 0) #active receptors
-Parameter('k1', 2*6e-10) #IKKn activation by IKKK
+Parameter('k1', 2.0*6e-10) #IKKn activation by IKKK
 Parameter('k3', 0.002) #IKKa inactivation by A20
 Parameter('k2', 10000) #IKKa inactivation
 Parameter('k4', 0.001) #IKKii transfer rate
-Parameter('AA', 1.0) #IkBa on (or off)
-Parameter('c0', 0.1) # inducible A20 and IkBa mRNA synthesis
 Parameter('c1a', 0.1) #inducible IkBa mRNA synthesis
-Parameter('AB', 1.0) #A20 (on or off)
 
 #IkBa Parameters
 Parameter('a2', 1e-7) #IkBa phosphorylation b/c IKKa
@@ -87,7 +94,6 @@ Parameter('i1', 0.01) #NFkB nuclear import
 Parameter('c4', 0.5) #A20, IkBa transformation rate
 Parameter('c5', 0.0005) #A20 degredation rate
 Parameter('c1', 0.1) #inducible A20 mRNA synthesis
-Parameter('G', 0) #initial status of A20 promoter
 Parameter('c3', 0.00075) #A20 and IkBa mRNA deg rate
 Parameter('q1', 4e-7) #NFkB attaching @ A20 and IkBa site
 Parameter('q2', 1e-6) #IkBa inducible detaching from A20, IkBa site
@@ -99,13 +105,17 @@ Parameter('a1_mult_kv', a1.value*kv.value) #for volume IkBa association NFkB
 Observable('IKKKa_obs', IKKK(state = 'a'))
 Observable('IKKKn_obs', IKK(state = 'n'))
 Observable('IKKa_obs', IKK(state = 'a'))
+Observable('IKKn_obs', IKK(state = 'n'))
 Observable('IKKi_obs', IKK(state = 'i'))
 Observable('IKKii_obs', IKK(state = 'ii'))
 Observable('TNF_ext_obs', TNF_ext())
-Observable('IkBa_p_obs', IkBa(b = None, phos = 'p', loc = 'c'))
+Observable('IkBap_obs', IkBa(b = None, phos = 'p', loc = 'c'))
 Observable('IkBan_NFkBn_obs', NFkB(b = 1,loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n'))
-# Observable('NFkB_c_obs', NFkB(b = None, loc = 'c'))
-# Observable('NFkBn_obs', NFkB(b = None, loc = 'n'))
+Observable('IkBap_NFkBc_obs', NFkB(b = 1,loc = 'n') % IkBa(b = 1, phos = 'p', loc = 'c'))
+Observable('NFkB_c_obs', NFkB(b = None, loc = 'c'))
+Observable('NFkBn_obs', NFkB(b = None, loc = 'n'))
+
+Observable('Nuclear_NFkBn', NFkB(b = 1,loc = 'n') % IkBa(b = 1, phos = 'u', loc = 'n') + NFkB(b = None, loc = 'n'))
 #
 Observable('A20_obs', A20())
 # Observable('IKKKa_obs', IKKKa()) #
@@ -277,20 +287,44 @@ Rule('NFkBn_and_IkBa_off', NFkB(b = None, loc = 'n') + IkBa_gene(state = 'off') 
 
 
 generate_equations(model, verbose = True)
-# for i,sp in enumerate(model.species):
-#     print i,":",sp
-# for i,ode in enumerate(model.odes):
-#     print i,":",ode
 
-# time = np.linspace(0, 18000, 1801)
-# #
-# # # ODE simulation
-# # # param_values = np.array([p.value for p in model.parameters])
-# # # param_values[18]=0.1
-# plt.figure('Struct')
-# x = odesolve(model, time, verbose=True) #integrator='lsoda',
+time = np.linspace(0, 18000, 1801)
+x = odesolve(model, time, verbose=True) #integrator='lsoda',
+
+
+for obs in ["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs","TNF_ext_obs", "IkBap_obs", "IkBap_NFkBc"]:
+    plt.figure(1)
+    plt.subplot(2,1,1)
+    plt.plot(time/60, x["TNF_ext_obs"], label = 'TNF')
+    plt.subplot(2,1,2)
+    plt.plot(time/60, x["IKKKa_obs"], label = 'IKKKa')
+    # plt.figure(2)
+    # plt.subplot(2,1,1)
+    # plt.plot(time/60, x["IKKii_obs"], label = 'IKKii')
+    # plt.subplot(2,1,2)
+    # plt.plot(time/60, x["IKKn_obs"], label = 'IKKn')
+    # plt.figure(3)
+    # plt.subplot(2,1,1)
+    # plt.plot(time/60, x["IKKa_obs"], label = 'IKKa')
+    # plt.subplot(2,1,2)
+    # plt.plot(time/60, x["IKKi_obs"], label = 'IKKi')
+    # plt.figure(4)
+    # plt.subplot(2,1,1)
+    # plt.plot(time/60, x["IkBap_obs"], label = 'IkBap')
+    # plt.subplot(2,1,2)
+    # plt.plot(time/60, x["IkBap_NFkBc_obs"], label = 'IkBap_NFkBc')
+    plt.legend(loc=0, prop={'size': 16})
+    plt.xlabel("Time (in minutes)", fontsize=16)
+    plt.ylabel("Concentrations", fontsize=16)
+
+plt.show()
+
+# plt.figure(1)
 # for obs in ["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs", "IkBa_p_obs", "IkBan_NFkBn_obs"]:
+#     plt.subplot(3,2,1)
 #     plt.plot(time, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#
+#
 #     # re.match(r"(\w+)_obs", obs).group()
 #     #plt.plot(time/60, x[obs.name], label=obs.name)
 #     plt.legend(loc=0, prop={'size': 16})
@@ -324,7 +358,7 @@ generate_equations(model, verbose = True)
 #
 # x = odesolve(model, time, verbose=True)
 # plt.figure(4)
-# plt.plot(time/60, x["NFkBn_obs"], label=NFkBn_obs)
+# plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
 # plt.xlabel("Time (in minutes)", fontsize=16)
 # plt.ylabel("Concentration", fontsize=16)
 # plt.legend()
@@ -341,7 +375,7 @@ generate_equations(model, verbose = True)
 # plt.ylabel("Concentration", fontsize=16)
 # plt.legend()
 
-plt.show()
+# plt.show()
 
 # generate_equations(model, verbose = True)
 # for i,ode in enumerate(model.odes):
