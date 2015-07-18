@@ -1,81 +1,29 @@
-__author__ = 'geena'
-
-import random
-import math
-#########################################################################
-####### Changes the values of the discrete variables              #######
-### First time to the next reaction is determined, then the reaction ####
-#########################################################################
-
-def StatusChange(AN,ANa,ANR,TRx,Gax,Gx,GRx,Bx,Yact,Yin,M):
-        
-    Ga=Gax; G=Gx; GR=GRx ;B=Bx
-
-    #   Yact- amount of NFkBn -Y(:,8)
-    #   Yin - amount of IKBa  -Y(:,12)
-    #   mk index (time) of gene status change
-
-    ro=(ANa-Gax)*q1*Yact+Gax*(q2*Yin)+(AN-Gx)*q1*Yact+Gx*(q2*Yin)+(ANR-GRx)*q1r*Yact+GRx*(q2r*Yin+q2rr)+(M-Bx)*(kb*TRx)+Bx*kf #total propensity function
-
-    roint=dt*cumtrapz(ro)        # propensity function integrated
-    fd=1-math.exp(-roint)             # Distribution of the switching time
-
-    r=rand
-    if (fd(len(fd))<r):
-
-        mk=len(fd)
-        break
-
-    if (fd(len(fd))>=r):
-
-    a=abs(fd-r)
-    mk=find((a-min(a))==0)         # mk = index (time) of next reaction
-
-
-    ######################################################
-    ####### Determining which reaction takes place #######
-    ######################################################
-
-    p1a=(ANa-Gax)*q1*Yact(mk)  # risk of NF-kB association to IKBa site at time mk
-    p2a=Gax*(q2*Yin(mk))       # risk of  NF-kB dissociation from IkBa at time mk
-
-    p1=(AN-Gx)*q1*Yact(mk)     # risk of NF-kB association to A20 site
-    p2=Gx*(q2*Yin(mk))         # risk of  NF-kB dissociation from A20 site
-
-    p1r=(ANR-GRx)*q1r*Yact(mk) # risk of NF-kB association to reporter gene
-    p2r=GRx*(q2r*Yin(mk)+q2rr) # risk of  NF-kB dissociation from reporter gene
-
-    p3=(M-Bx)*kb*TRx(mk)  # risk of TNFR1-TNF binding
-    p4=Bx*kf             # rist of TNFR1 inactivation
-
-    ss=(p1a+p2a+p1+p2+p1r+p2r+p3+p4)
-    p1a=p1a/ss; p2a=p2a/ss
-    p1=p1/ss; p2=p2/ss
-    p1r=p1r/ss; p2r=p2r/ss
-    p3=p3/ss; p4=p4/ss
-
-    rnumber= random.gauss(0,1)
-
-    if (rnumber<p1a):
-        Ga=Ga+1  #IKBa activates
-
-    if (rnumber>=p1a)&(rnumber<p1a+p2a):
-        Ga=Ga-1  #IKBa inactivates
-
-    if (rnumber>=p1a+p2a)&(rnumber<p1a+p2a+p1):
-        G=G+1     #A20 activates
-
-    if (rnumber>=p1a+p2a+p1)&(rnumber<p1a+p2a+p1+p2):
-        G=G-1     #A20 inactivates
-
-    if (rnumber>=p1a+p2a+p1+p2)&(rnumber<p1a+p2a+p1+p2+p1r):
-        GR=GR+1   #reporter gene activates
-
-    if (rnumber>=p1a+p2a+p1+p2+p1r)&(rnumber<p1a+p2a+p1+p2+p1r+p2r):
-        GR=GR-1   #reporter gene inactivates
-
-    if (rnumber>=p1a+p2a+p1+p2+p1r+p2r)&(rnumber<p1a+p2a+p1+p2+p1r+p2r+p3):
-        B=B+1    #receptor activation
-
-    if (rnumber>=p1a+p2a+p1+p2+p1r+p2r+p3)&(rnumber<p1a+p2a+p1+p2+p1r+p2r+p3+p4):
-        B=B-1    #receptor deactivation
+kb,1.2*10e-5    #default 1.2*10e-5 - receptor activation rate
+kf,1.2*10e-3    #default 1.2*10e-3 - receptor inactivation rate
+q1,4*10e-7      #default 4*10e-7 - NF-kB ataching at A20 and IkBa site                                     
+q2,10e-6        #default 10e-6 - IkBa inducible detaching from A20 and IkBa site
+Tdeg,7.7*10e-4  #TNF loss
+KN,10e5         #default 10e5 - total number of IKKK kinase molecules, Assumption
+KNN,2*10e5      #default 2*10e5 - total number of IKK kinase molecules, Assumption
+ka,10e-5        #default 10e-5 - IKKK kinase activation rate (at most 1/s), Assumption                        
+ki,0.01         #default 0.01 - IKKK kinase inactivation rate, Assumption
+c1,0.1          #inducible A20 mRNA synthesis
+c3,0.00075      #default 0.00075 - A20 and IkBa mRNA degradation rate
+c4,0.5          #default 0.5 - A20 and IkBa translation rate, FIT
+c5,0.0005       #default 0.0005 - A20 degradation rate, FIT
+ka20,10e5       #default 10000 - A20 TNFR1 block, FIT                                                      
+k2,10000        #default 10000 - IKKa inactivation caused by A20, FIT                                         
+k1,6*10e-10     #default 6*10e-10 IKKn activation caused by active IKKK, FIT
+k3,0.002        #default 0.002 - IKKa inactivation, FIT                                                          
+k4,0.001        #default 0.001 - IKKii transformation, FIT
+c1a,0.1         #inducible IkBa mRNA synthesis 
+a1,5*10e-7      #default 5*10e-7 - IkBA*NFkB association, Assumption
+a2,10e-7        #default 10e-7 - IkBa phosphoryation due to action of IKKa, FIT
+a3,5*10e-7      #default 5*10e-7 - (IkBa|NFkb) phosphorylation due to action of IKKa, (at most 0.01/s) FIT
+tp,0.01         #default 0.01 - degradation of phospho-IkBa and phospho-IkBa complexed to NF-kB, FIT  
+c5a,0.0001      #default 0.0001 - IkBa degradation rate
+c6a,0.00002     #default 0.00002 - spontaneous (IkBa|NFkB) degradation of IkBa  complexed to NF-kB
+i1,0.01         #default 0.01 - NFkB nuclear import, FIT 
+e2a,0.05        #default 0.05 - (IkBa|NFkB) nuclear export, FIT 
+i1a,0.002       #default 0.002 - IkBa nuclear import, FIT
+e1a,0.005       #default 0.005 - IkBa nuclear export, FIT 

@@ -34,6 +34,7 @@ Parameter('M', 2000)
 Parameter('AN', 2)
 Parameter('ANa', 2)
 
+
 #Declaring initial conditions
 Initial(IKKK(state = 'a'), Parameter('IKKKa_0'))
 Initial(IKK(state = 'n'), Parameter('IKKn_0', 2e5))
