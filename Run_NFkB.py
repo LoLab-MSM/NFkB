@@ -41,7 +41,7 @@ colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', '0.5']
 # plt.plot(time, xobs1)
 # plt.legend(['IKKn', 'IkBap|NFkB', 'TNF', 'IKKii', 'IKKKa', 'IKKa', 'IKKi', 'IkBap'])
 # plt.show()
-plt.figure()
+plt.figure(1)
 for i,sp in enumerate([10, 18, 21, 22, 23, 25]):
         plt.plot(time/60, x["__s%d"%sp], color = str(colors[i]), lw = 3) #, label=str(m1.species[sp])) #@TODO not correct?
         plt.plot(time/60, y["__s%d"%sp], "--", color = str(colors[i]), lw = 3, label=str(m2.species[sp]))
@@ -50,6 +50,7 @@ plt.xlabel("Time (in minutes)", fontsize=16)
 plt.ylabel("Concentrations", fontsize=16)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
+plt.savefig("Figure 1", format= "png")
 # plt.yscale('log')
 plt.show()
 
@@ -62,6 +63,7 @@ plt.xlabel("Time (in minutes)", fontsize=16)
 plt.ylabel("Concentrations", fontsize=16)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
+plt.savefig("Figure 2", format= "png")
 # plt.yscale('log')
 plt.show()
 
@@ -74,6 +76,7 @@ plt.xlabel("Time (in minutes)", fontsize=16)
 plt.ylabel("Concentrations", fontsize=16)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
+plt.savefig("Figure 3", format= "png")
 # plt.yscale('log')
 plt.show()
 
@@ -86,8 +89,10 @@ plt.xlabel("Time (in minutes)", fontsize=16)
 plt.ylabel("Concentrations", fontsize=16)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
+plt.savefig("Figure 4", format= "png")
 # plt.yscale('log')
 plt.show()
+
 
 plt.figure()
 for i,sp in enumerate([1]):
@@ -98,6 +103,7 @@ plt.xlabel("Time (in minutes)", fontsize=16)
 plt.ylabel("Concentrations", fontsize=16)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
+plt.savefig("Figure 5", format= "png")
 # plt.yscale('log')
 plt.show()
 
