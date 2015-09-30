@@ -158,153 +158,153 @@ Rule('IKKii_to_IKKn', IKK(state = 'ii') >> IKK(state = 'n'), k4) #IKKii creates 
 Rule('NFkBn_and_A20_off', NFkB(b = None, loc = 'n') + A20_gene(state = 'off') >> NFkB(b = None, loc = 'n') + A20_gene(state = 'on'), q1) #NFkB turning off A20 gene state
 Rule('NFkBn_and_IkBa_off', NFkB(b = None, loc = 'n') + IkBa_gene(state = 'off') >> NFkB(b = None, loc = 'n') + IkBa_gene(state = 'on'), q1) #NFkB turning off IkBa gene state
 
+if __name__ == "__main__":
+    generate_equations(model, verbose = True)
 
-generate_equations(model, verbose = True)
-
-time = np.linspace(0, 18000, 1801)
-x = odesolve(model, time, verbose=True) #integrator='lsoda',
+    time = np.linspace(0, 18000, 1801)
+    x = odesolve(model, time, verbose=True) #integrator='lsoda',
 
 
-# for obs in ["IkBap_NFkBc_obs"]:
-#     plt.figure(1)
-#     plt.plot(time/60, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     # plt.subplot(2,1,1)
-#     # plt.plot(time/60, x["TNF_ext_obs"], label = 'TNF')
-#     # plt.subplot(2,1,2)
-#     # plt.plot(time/60, x["IKKKa_obs"], label = 'IKKKa')
-#     # plt.figure(2)
-#     # plt.subplot(2,1,1)
-#     # plt.plot(time/60, x["IKKii_obs"], label = 'IKKii')
-#     # plt.subplot(2,1,2)
-#     # plt.plot(time/60, x["IKKn_obs"], label = 'IKKn')
-#     # plt.figure(3)
-#     # plt.subplot(2,1,1)
-#     # plt.plot(time/60, x["IKKa_obs"], label = 'IKKa')
-#     # plt.subplot(2,1,2)
-#     # plt.plot(time/60, x["IKKi_obs"], label = 'IKKi')
-#     # plt.figure(4)
-#     # plt.subplot(2,1,1)
-#     # plt.plot(time/60, x["IkBap_obs"], label = 'IkBap')
-#     # plt.subplot(2,1,2)
-#     # plt.plot(time/60, x["IkBap_NFkBc_obs"], label = 'IkBap_NFkBc')
-#     plt.legend(loc=0, prop={'size': 16})
-#     plt.xlabel("Time (in minutes)", fontsize=16)
-#     plt.ylabel("Concentrations", fontsize=16)
-#     plt.xlim(xmax = 300)
-#     plt.ylim(ymin = 0, ymax = 1000)
-#
-#
-# plt.figure(2)
-# for obs in ["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs", "IkBap_obs", "IkBan_NFkBn_obs"]:
-#     # plt.subplot(3,2,1)
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     # re.match(r"(\w+)_obs", obs).group()
-#     #plt.plot(time/60, x[obs.name], label=obs.name)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
-#
-# # plt.figure()
-# # for i in range(len(model.species)):
-# #     plt.plot(time/60, x["__s%d" %i])
-# plt.figure(3)
-# for obs in ["TNFR1a_obs", "A20_on_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
-#
-# plt.figure(4)
-# for obs in ["A20_obs", "A20_off_obs", "IkBac_obs", "IkBan_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
-#
-# plt.figure(5)
-# for obs in ["A20_on_obs", "A20_off_obs", "IkBa_off_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
+    # for obs in ["IkBap_NFkBc_obs"]:
+    #     plt.figure(1)
+    #     plt.plot(time/60, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     # plt.subplot(2,1,1)
+    #     # plt.plot(time/60, x["TNF_ext_obs"], label = 'TNF')
+    #     # plt.subplot(2,1,2)
+    #     # plt.plot(time/60, x["IKKKa_obs"], label = 'IKKKa')
+    #     # plt.figure(2)
+    #     # plt.subplot(2,1,1)
+    #     # plt.plot(time/60, x["IKKii_obs"], label = 'IKKii')
+    #     # plt.subplot(2,1,2)
+    #     # plt.plot(time/60, x["IKKn_obs"], label = 'IKKn')
+    #     # plt.figure(3)
+    #     # plt.subplot(2,1,1)
+    #     # plt.plot(time/60, x["IKKa_obs"], label = 'IKKa')
+    #     # plt.subplot(2,1,2)
+    #     # plt.plot(time/60, x["IKKi_obs"], label = 'IKKi')
+    #     # plt.figure(4)
+    #     # plt.subplot(2,1,1)
+    #     # plt.plot(time/60, x["IkBap_obs"], label = 'IkBap')
+    #     # plt.subplot(2,1,2)
+    #     # plt.plot(time/60, x["IkBap_NFkBc_obs"], label = 'IkBap_NFkBc')
+    #     plt.legend(loc=0, prop={'size': 16})
+    #     plt.xlabel("Time (in minutes)", fontsize=16)
+    #     plt.ylabel("Concentrations", fontsize=16)
+    #     plt.xlim(xmax = 300)
+    #     plt.ylim(ymin = 0, ymax = 1000)
+    #
+    #
+    # plt.figure(2)
+    # for obs in ["IKKKa_obs", "IKKii_obs", "IKKa_obs", "IKKi_obs", "IkBap_obs", "IkBan_NFkBn_obs"]:
+    #     # plt.subplot(3,2,1)
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     # re.match(r"(\w+)_obs", obs).group()
+    #     #plt.plot(time/60, x[obs.name], label=obs.name)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # # plt.figure()
+    # # for i in range(len(model.species)):
+    # #     plt.plot(time/60, x["__s%d" %i])
+    # plt.figure(3)
+    # for obs in ["TNFR1a_obs", "A20_on_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # plt.figure(4)
+    # for obs in ["A20_obs", "A20_off_obs", "IkBac_obs", "IkBan_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # plt.figure(5)
+    # for obs in ["A20_on_obs", "A20_off_obs", "IkBa_off_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
 
-# plt.figure(6)
-# for obs in ["A20t_obs"]: #, "IkBat_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
-#
-# plt.figure(7)
-# for obs in ["IkBat_obs"]: #, "IkBat_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
-#
-# plt.figure(8)
-# for obs in ["NFkBn_obs", "NFkBc_obs"]: #, "IkBat_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
-#
-# plt.figure(9)
-# for obs in ["IkBac_obs"]: #, "IkBat_obs"]:
-#     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-#     plt.legend(loc=0, prop={'size': 16})
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentrations", fontsize=16)
-# plt.xticks(fontsize=10)
-# plt.yticks(fontsize=10)
+    # plt.figure(6)
+    # for obs in ["A20t_obs"]: #, "IkBat_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # plt.figure(7)
+    # for obs in ["IkBat_obs"]: #, "IkBat_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # plt.figure(8)
+    # for obs in ["NFkBn_obs", "NFkBc_obs"]: #, "IkBat_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # plt.figure(9)
+    # for obs in ["IkBac_obs"]: #, "IkBat_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
 
-plt.figure(10)
-for obs in ["A20_obs"]: #, "IkBat_obs"]:
-    plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-    plt.legend(loc=0, prop={'size': 16})
-plt.xlabel("Time (in minutes)", fontsize=16)
-plt.ylabel("Concentrations", fontsize=16)
-plt.xticks(fontsize=10)
-plt.yticks(fontsize=10)
+    plt.figure(10)
+    for obs in ["A20_obs"]: #, "IkBat_obs"]:
+        plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+        plt.legend(loc=0, prop={'size': 16})
+    plt.xlabel("Time (in minutes)", fontsize=16)
+    plt.ylabel("Concentrations", fontsize=16)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
 
-plt.show()
+    plt.show()
 
-#
-# x = odesolve(model, time, verbose=True)
-# plt.figure(4)
-# plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# plt.legend()
-#
-# plt.figure(5)
-# plt.plot(time/60, x["IkBa_off_obs"], label=IkBa_off_obs)
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# plt.legend()
-#
-# plt.figure(6)
-# plt.plot(time/60, x["IkBa_on_obs"], label=IkBa_on_obs)
-# plt.xlabel("Time (in minutes)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# plt.legend()
+    #
+    # x = odesolve(model, time, verbose=True)
+    # plt.figure(4)
+    # plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentration", fontsize=16)
+    # plt.legend()
+    #
+    # plt.figure(5)
+    # plt.plot(time/60, x["IkBa_off_obs"], label=IkBa_off_obs)
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentration", fontsize=16)
+    # plt.legend()
+    #
+    # plt.figure(6)
+    # plt.plot(time/60, x["IkBa_on_obs"], label=IkBa_on_obs)
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentration", fontsize=16)
+    # plt.legend()
 
-# plt.show()
+    # plt.show()
 
-# generate_equations(model, verbose = True)
-# for i,ode in enumerate(model.odes):
-#     print i,":",ode
+    # generate_equations(model, verbose = True)
+    # for i,ode in enumerate(model.odes):
+    #     print i,":",ode
