@@ -121,7 +121,7 @@ Observable('IkBat_obs', IkBa_mRNA())
 Observable('IkBa_NFkB_obs', NFkB(b = 1,loc = 'c') % IkBa(b = 1, phos = 'u', loc = 'c'))
 
 #Declaring expression
-Expression('keff', sympify("ka*ka20/(ka20+A20_obs)")) #10000 #michaelis menten
+Expression('keff', ka*ka20/(ka20+A20_obs)) #10000 #michaelis menten
 
 #Declaring rules
 Rule('TNF_activate_TNFR1', TNF_ext() + TNFR1(state = 'i') >> TNF_ext() + TNFR1(state = 'a'), kb) #TNFa binding to TNFR1

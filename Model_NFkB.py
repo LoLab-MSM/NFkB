@@ -173,7 +173,7 @@ Observable('IKKn_obs', IKKn()) #
 Observable('A20_obs', A20())
 
 # def declare_functions():
-Expression('keff', sympify("ka*ka20/(ka20+A20_obs)")) #10000 #michaelis menten
+Expression('keff', ka*ka20/(ka20+A20_obs)) #10000 #michaelis menten
 
 
 #Declaring rules

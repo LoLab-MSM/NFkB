@@ -108,7 +108,7 @@ Parameter('a1_mult_kv', a1.value*kv.value) #for volume IkBa association NFkB
 
 #Declaring expression
 Observable('A20_obs', A20())
-Expression('keff', sympify("ka*ka20/(ka20+A20_obs)")) #10000 #michaelis menten
+Expression('keff', ka*ka20/(ka20+A20_obs)) #10000 #michaelis menten
 
 #Declaring rules
 Rule('TNF_ext_and_TNFR1i', TNF_ext() + TNFR1i() >> TNF_ext() + TNFR1a(), kb)
