@@ -95,7 +95,7 @@ Parameter('a1_mult_kv', a1.value*kv.value) #for volume IkBa association NFkB
 
 #Declaring observables
 Observable('IKKKa_obs', IKKK(state = 'a'))
-Observable('IKKKn_obs', IKK(state = 'n'))
+Observable('IKKKn_obs', IKKK(state = 'n'))
 Observable('IKKa_obs', IKK(state = 'a'))
 Observable('IKKn_obs', IKK(state = 'n'))
 Observable('IKKi_obs', IKK(state = 'i'))
