@@ -1,81 +1,150 @@
 __author__ = 'geena'
 
 from pysb import *
-from pysb.util import *
-from pysb.macros import *
-from pysb.bng import *
+import pandas as pd
 from pysb.core import *
-from sympy import sympify
 from pysb.bng import *
-from pysb.integrate import odesolve
-from pysb.bng import run_ssa
+from pysb.integrate import *
 import matplotlib.pyplot as plt
 import numpy as np
-from pysb import *
-from pysb.util import *
-from pysb.macros import *
-from pysb.bng import *
-from pysb.core import *
-from sympy import sympify
-from pysb.bng import *
-from pysb.integrate import odesolve
-from pysb.bng import run_ssa
-import matplotlib.pyplot as plt
-import numpy as np
+from scipy import interpolate
+from scipy.interpolate import *
+import scipy.interpolate
 
 Model ()
 
+result = []
+with open('_diswitch.txt','r') as inputFile:
+    for line in inputFile:
+        result.append(float(line))
+ikk2 = np.asarray(result)
+# print(result)
+# quit()
 #Declaration of monomers
-Monomer('IkBa', ['b', 'c', 'S'], {'S': ['C', 'N']})
-Monomer('IkBb', ['b', 'c', 'S'], {'S': ['C', 'N']})
-Monomer('IkBe', ['b', 'c', 'S'], {'S': ['C', 'N']})
-Monomer('IkBd', ['b', 'c', 'S'], {'S': ['C', 'N']})
+
+""" Delcares IkBa, IkBb, IkBe, and IkBd monomers. All four of these monomers have binding sites to IKK2
+    (for IkBa, IkBb, IkBe), and IKK1 (for IkBd). The monomers import and export between the Cytoplasm
+    and the Nucleus.  Declares the IkBa, IkBb, IkBe, and IkBd mRNA monomers. The monomers go through constitutive RNA synthesis
+    without the presence of NFkB in the nucleus,  and inducible RNA synthesis in the presence of NFkB in the nucleus. """
+
+# def ikba_and_mRNA_monomers():
+Monomer('IkBa', ['ikk', 'nfkb', 'S'], {'S': ['C', 'N']})
 Monomer('IkBa_mRNA')
+
+# def ikbb_and_mRNA_monomers():
+Monomer('IkBb', ['ikk', 'nfkb', 'S'], {'S': ['C', 'N']})
 Monomer('IkBb_mRNA')
+
+# def ikbe_and_mRNA_monomers():
+Monomer('IkBe', ['ikk', 'nfkb', 'S'], {'S': ['C', 'N']})
 Monomer('IkBe_mRNA')
+
+# def ikbd_and_mRNA_monomers():
+Monomer('IkBd', ['ikk', 'nfkb', 'S'], {'S': ['C', 'N']})
 Monomer('IkBd_mRNA')
-Monomer('NFkB', ['b', 'S'], {'S': ['C', 'N']})
-Monomer('IKK1', ['b', 'c', 'S'], {'S': ['C', 'N']})
-Monomer('IKK2', ['b', 'c', 'S'], {'S': ['C', 'N']})
+
+
+# Declares NFkB, IKK1, and IKK2 which having a binding site to IkB and NFkB can transport between the Cytoplasm
+# and the Nucleus. IKK1 and IKK2 only exist in the Cytoplasm.
+
+# def nfkb_and_ikk_monomers():
+Monomer('NFkB', ['ikb', 'S'], {'S': ['C', 'N']})
+
+# def ikk1_monomer():
+Monomer('IKK1', ['ikb', 'S'], {'S': ['C', 'N']})
+
+# def ikk2_monomer():
+Monomer('IKK2', ['ikb', 'S'], {'S': ['C', 'N']})
 
 #Declaration of initial conditions
-
+# def initial_ikk1_conditions():
 Parameter('IKK1_0', 0.1) #Inhibitor Kinase Kinase a
+Initial(IKK1(ikb=None, S='C'), IKK1_0)
+
+# def initial_ikk2_conditions():
 Parameter('IKK2_0', 0.1) #Inhibitor Kinase Kinase b
+Initial(IKK2(ikb=None, S='C'), IKK2_0)
+
+# def initial nfkb_conditions():
 Parameter('NFkB_0', 0.125) #Nuclear Factor-kappaB
+Initial(NFkB(ikb=None, S='N'), NFkB_0)
 
-Initial(IKK1(b=None, c=None, S='C'), IKK1_0)
-Initial(IKK2(b=None, c=None, S='C'), IKK2_0)
-Initial(NFkB(b=None, S='N'), NFkB_0)
+#RNA synthesis by NFkBn and Hill Coefficient
 
-Observable('NFkBn', NFkB(b=ANY, S='N'))
+# Observable('IkBa_mRNA_obs', IkBa_mRNA())
+# Observable('IkBa_obs', IkBa(b=ANY, c=ANY, S=ANY))
+#Observables for NFkB
+Observable('NFkBn_free', NFkB(ikb=None, S='N'))
+Observable('IKK2_obs', IKK2(ikb = None, S='C'))
+Observable('NFkBc_free', NFkB(ikb=None, S='C'))
+Observable('NFkBn_obs', NFkB(ikb=WILD, S='N'))
+Observable('NFkBn_bound', NFkB(ikb=ANY, S='N'))
+
+Observable('IkBa_mRNA_obs', IkBa_mRNA())
+Observable('IkBb_mRNA_obs', IkBb_mRNA())
+Observable('IkBe_mRNA_obs', IkBe_mRNA())
+Observable('IkBd_mRNA_obs', IkBd_mRNA())
+
+Observable('IkBa_obs', IkBa(ikk = None, nfkb = None, S='C'))
+Observable('IkBb_obs', IkBb(ikk = WILD, nfkb = WILD, S=WILD))
+Observable('IkBe_obs', IkBe(ikk = WILD, nfkb = WILD, S=WILD))
+Observable('IkBd_obs', IkBd(ikk = WILD, nfkb = WILD, S=WILD))
+
+
+Parameter('hill', 3)
+Parameter('a', 6)
+Parameter('b', 0.25)
+Parameter('e', 0.5)
+Parameter('d', 0.025)
+
+Expression('a_NFkBn', a*(NFkBn_free)**(hill))
+Expression('b_NFkBn', b*(NFkBn_free)**(hill))
+Expression('e_NFkBn', e*(NFkBn_free)**(hill))
+Expression('d_NFkBn', d*(NFkBn_free)**(hill))
+
+Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
+Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
+Rule('en_mRNA', None >> IkBe_mRNA(), e_NFkBn)
+Rule('dn_mRNA', None >> IkBd_mRNA(), d_NFkBn)
 
 # IkB mRNA and protein synthesis reactions
 
 Parameter('mRNA_a', 0.035)
+Rule('a_mRNA', IkBa_mRNA() >> None, mRNA_a)
+
+
 Parameter('mRNA_b', 3e-3)
 Parameter('mRNA_e', 4e-3)
 Parameter('mRNA_d', 2e-3)
-Parameter('synth', 0.25)
-Parameter('synth_a', 2e-4)
-Parameter('synth_b', 1e-5)
-Parameter('synth_e', 3e-6)
-Parameter('synth_d', 1e-7)
-Parameter('psynth_a', 2e-4)
-Parameter('psynth_b', 1e-5)
-Parameter('psynth_e', 3e-6)
-Parameter('psynth_d', 1e-7)
 
-Rule('a_mRNA', IkBa_mRNA() >> None, mRNA_a)
 Rule('b_mRNA', IkBb_mRNA() >> None, mRNA_b)
 Rule('e_mRNA', IkBe_mRNA() >> None, mRNA_e)
 Rule('d_mRNA', IkBd_mRNA() >> None, mRNA_d)
 
-Rule('a_psynth', None >> IkBa(b=None, c=None, S='C'), synth)
-Rule('b_psynth', None >> IkBb(b=None, c=None, S='C'), synth)
-Rule('e_psynth', None >> IkBe(b=None, c=None, S='C'), synth)
-Rule('d_psynth', None >> IkBd(b=None, c=None, S='C'), synth)
 
+# Parameter('synth', 0.2448)
+# Rule('a_psynth', None >> IkBa(ikk=None, nfkb=None, S='C'), synth)
+# Rule('b_psynth', None >> IkBb(ikk=None, nfkb=None, S='C'), synth)
+# Rule('e_psynth', None >> IkBe(ikk=None, nfkb=None, S='C'), synth)
+# Rule('d_psynth', None >> IkBd(ikk=None, nfkb=None, S='C'), synth)
+
+Parameter('syntha', 0.2448)
+Rule('a_psynth', IkBa_mRNA() >> IkBa(ikk=None, nfkb=None, S='C') + IkBa_mRNA(), syntha)
+
+Parameter('synthb', 0.2448)
+Rule('b_psynth', IkBb_mRNA() >> IkBb(ikk=None, nfkb=None, S='C') + IkBb_mRNA(), synthb)
+
+Parameter('synthe', 0.2448)
+Rule('e_psynth', IkBe_mRNA() >> IkBe(ikk=None, nfkb=None, S='C') + IkBe_mRNA(), synthe)
+
+Parameter('synthd', 0.2448)
+Rule('d_psynth', IkBd_mRNA() >> IkBd(ikk=None, nfkb=None, S='C') + IkBd_mRNA(), synthd)
+
+
+Parameter('psynth_a', 2e-4)
+Parameter('psynth_b', 1e-5)
+Parameter('psynth_e', 3e-6)
+Parameter('psynth_d', 1e-7)
 Rule('a_synth', None >> IkBa_mRNA(), psynth_a)
 Rule('b_synth', None >> IkBb_mRNA(), psynth_b)
 Rule('e_synth', None >> IkBe_mRNA(), psynth_e)
@@ -83,139 +152,243 @@ Rule('d_synth', None >> IkBd_mRNA(), psynth_d)
 
 #IkB(a,b,e) association and dissociation from IKK2 and IkBd association and dissociation from IKK2
 
-Parameter('a_IKKf', 1.35)
-Parameter('a_IKKr', 0.75)
-Parameter('b_IKKf', 0.36)
-Parameter('IkB_IKK_r', 0.105)
-Parameter('ed_IKKf', 0.54)
-Parameter('IkB_IKK_NFkBaf', 11.1)
-Parameter('IkB_IKK_NFkBbf', 2.88)
-Parameter('IkB_IKK_NFkBedf', 4.2)
+Parameter('a_2f', 1.35)
+Parameter('a_2r', 0.075)
+Parameter('b_kf', 0.36)
+Parameter('b_2r', 0.105)
+Parameter('e_2r', 0.105)
+Parameter('d_1r', 0.105)
+Parameter('e_2f', 0.54)
+Parameter('d_1f', 0.54)
+Rule('a2_adc', IkBa(ikk=None, nfkb=None, S='C') + IKK2(ikb=None, S='C') <> IkBa(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C'), a_2f, a_2r)
+Rule('b2_adc', IkBb(ikk=None, nfkb=None, S='C') + IKK2(ikb=None, S='C') <> IkBb(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C'), b_kf, b_2r)
+Rule('e2_adc', IkBe(ikk=None, nfkb=None, S='C') + IKK2(ikb=None, S='C') <> IkBe(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C'), e_2f, e_2r)
+Rule('d1_adc', IkBd(ikk=None, nfkb=None, S='C') + IKK1(ikb=None, S='C') <> IkBd(ikk=1, nfkb=None, S='C')%IKK1(ikb=1, S='C'), d_1f, d_1r)
+
+
+
 Parameter('IkB_IKKf', 30)
 Parameter('IkB_IKKr', 6e-5)
-
-Rule('a2_adc', IkBa(b=None, c=None, S='C') + IKK2(b=None, c=None, S='C') <> IkBa(b=1, c=None, S='C')%IKK2(b=1, c=None, S='C'), a_IKKf, a_IKKr)
-Rule('b2_adc', IkBb(b=None, c=None, S='C') + IKK2(b=None, c=None, S='C') <> IkBb(b=1, c=None, S='C')%IKK2(b=1, c=None, S='C'), b_IKKf, IkB_IKK_r)
-Rule('e2_adc', IkBe(b=None, c=None, S='C') + IKK2(b=None, c=None, S='C') <> IkBe(b=1, c=None, S='C')%IKK2(b=1, c=None, S='C'), ed_IKKf, IkB_IKK_r)
-Rule('d1_adc', IkBd(b=None, c=None, S='C') + IKK1(b=None, c=None, S='C') <> IkBd(b=1, c=None, S='C')%IKK1(b=1, c=None, S='C'), ed_IKKf, IkB_IKK_r)
-
-Rule('a2n_c1', IkBa(b=None, c=1, S='C')%IKK2(b=None, c=1, S='C') + NFkB(b=None, S='C') <> IkBa(b=None, c=1, S='C')%NFkB(b=2, S='C')%IKK2(b=2, c=1, S='C'), IkB_IKKf, IkB_IKKr)
-Rule('b2n_c1', IkBb(b=None, c=1, S='C')%IKK2(b=None, c=1, S='C') + NFkB(b=None, S='C') <> IkBb(b=None, c=1, S='C')%NFkB(b=2, S='C')%IKK2(b=2, c=1, S='C'), IkB_IKKf, IkB_IKKr)
-Rule('e2n_c1', IkBe(b=None, c=1, S='C')%IKK2(b=None, c=1, S='C') + NFkB(b=None, S='C') <> IkBe(b=None, c=1, S='C')%NFkB(b=2, S='C')%IKK2(b=2, c=1, S='C'), IkB_IKKf, IkB_IKKr)
-Rule('d1n_c1', IkBd(b=None, c=1, S='C')%IKK1(b=None, c=1, S='C') + NFkB(b=None, S='C') <> IkBd(b=None, c=1, S='C')%NFkB(b=2, S='C')%IKK1(b=2, c=1, S='C'), IkB_IKKf, IkB_IKKr)
-
-Rule('a2n_c', IkBa(b=1, c=None, S='C')%NFkB(b=1, S='C') + IKK2(b=None, c=None, S='C') <> IkBa(b=1, c=2, S='C')%NFkB(b=1, S='C')%IKK2(b=None, c=2, S='C'), IkB_IKK_NFkBaf, a_IKKr)
-Rule('b2n_c', IkBb(b=1, c=None, S='C')%NFkB(b=1, S='C') + IKK2(b=None, c=None, S='C') <> IkBb(b=1, c=2, S='C')%NFkB(b=1, S='C')%IKK2(b=None, c=2, S='C'), IkB_IKK_NFkBbf, IkB_IKKr)
-Rule('e2n_c', IkBe(b=1, c=None, S='C')%NFkB(b=1, S='C') + IKK2(b=None, c=None, S='C') <> IkBe(b=1, c=2, S='C')%NFkB(b=1, S='C')%IKK2(b=None, c=2, S='C'), IkB_IKK_NFkBedf, IkB_IKKr)
-Rule('d1n_c', IkBd(b=1, c=None, S='C')%NFkB(b=1, S='C') + IKK1(b=None, c=None, S='C') <> IkBd(b=1, c=2, S='C')%NFkB(b=1, S='C')%IKK1(b=None, c=2, S='C'), IkB_IKK_NFkBedf, IkB_IKKr)
+Rule('a2n_c1', IkBa(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C') + NFkB(ikb=None, S='C') <> IkBa(ikk=1, nfkb=2, S='C')%IKK2(ikb=1, S='C')%NFkB(ikb=2, S='C'), IkB_IKKf, IkB_IKKr)
+Rule('b2n_c1', IkBb(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C') + NFkB(ikb=None, S='C') <> IkBb(ikk=1, nfkb=2, S='C')%IKK2(ikb=1, S='C')%NFkB(ikb=2, S='C'), IkB_IKKf, IkB_IKKr)
+Rule('e2n_c1', IkBe(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C') + NFkB(ikb=None, S='C') <> IkBe(ikk=1, nfkb=2, S='C')%IKK2(ikb=1, S='C')%NFkB(ikb=2, S='C'), IkB_IKKf, IkB_IKKr)
+Rule('d1n_c1', IkBd(ikk=1, nfkb=None, S='C')%IKK1(ikb=1, S='C') + NFkB(ikb=None, S='C') <> IkBd(ikk=1, nfkb=2, S='C')%IKK1(ikb=1, S='C')%NFkB(ikb=2, S='C'), IkB_IKKf, IkB_IKKr)
 
 
-Rule('an_adc', IkBa(b=None, c=None, S='C') + NFkB(b=None, S='C') <> IkBa(b=1, c=None, S='C')%NFkB(b=1, S='C'), IkB_IKKf, IkB_IKKr)
-Rule('bn_adc', IkBb(b=None, c=None, S='C') + NFkB(b=None, S='C') <> IkBb(b=1, c=None, S='C')%NFkB(b=1, S='C'), IkB_IKKf, IkB_IKKr)
-Rule('en_adc', IkBe(b=None, c=None, S='C') + NFkB(b=None, S='C') <> IkBe(b=1, c=None, S='C')%NFkB(b=1, S='C'), IkB_IKKf, IkB_IKKr)
-Rule('dn_adc', IkBd(b=None, c=None, S='C') + NFkB(b=None, S='C') <> IkBd(b=1, c=None, S='C')%NFkB(b=1, S='C'), IkB_IKKf, IkB_IKKr)
+Parameter('an_2f', 11.1)
+Parameter('bn_2f', 2.88)
+Parameter('en_2f', 4.2)
+Parameter('dn_1f', 4.2)
+Parameter('an_2r', 0.075)
+Parameter('bn_2r', 0.105)
+Parameter('en_2r', 0.105)
+Parameter('dn_1r', 0.105)
+Rule('a2n_c', IkBa(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK2(ikb=None, S='C') <> IkBa(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK2(ikb=2, S='C'), an_2f, an_2r)
+Rule('b2n_c', IkBb(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK2(ikb=None, S='C') <> IkBb(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK2(ikb=2, S='C'), bn_2f, bn_2r)
+Rule('e2n_c', IkBe(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK2(ikb=None, S='C') <> IkBe(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK2(ikb=2, S='C'), en_2f, en_2r)
+Rule('d1n_c', IkBd(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK1(ikb=None, S='C') <> IkBd(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK1(ikb=2, S='C'), dn_1f, dn_1r)
 
-Rule('an_adn', IkBa(b=None, c=None, S='N') + NFkB(b=None, S='N') <> IkBa(b=1, c=None, S='N')%NFkB(b=1, S='N'), IkB_IKKf, IkB_IKKr)
-Rule('bn_adn', IkBb(b=None, c=None, S='N') + NFkB(b=None, S='N') <> IkBb(b=1, c=None, S='N')%NFkB(b=1, S='N'), IkB_IKKf, IkB_IKKr)
-Rule('en_adn', IkBe(b=None, c=None, S='N') + NFkB(b=None, S='N') <> IkBe(b=1, c=None, S='N')%NFkB(b=1, S='N'), IkB_IKKf, IkB_IKKr)
-Rule('dn_adn', IkBd(b=None, c=None, S='N') + NFkB(b=None, S='N') <> IkBd(b=1, c=None, S='N')%NFkB(b=1, S='N'), IkB_IKKf, IkB_IKKr)
 
+# Parameter('IkB_IKKf', 30)
+# Parameter('IkB_IKKr', 6e-5)
+Rule('an_adc', IkBa(ikk=None, nfkb=None, S='C') + NFkB(ikb=None, S='C') <> IkBa(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C'), IkB_IKKf, IkB_IKKr)
+Rule('bn_adc', IkBb(ikk=None, nfkb=None, S='C') + NFkB(ikb=None, S='C') <> IkBb(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C'), IkB_IKKf, IkB_IKKr)
+Rule('en_adc', IkBe(ikk=None, nfkb=None, S='C') + NFkB(ikb=None, S='C') <> IkBe(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C'), IkB_IKKf, IkB_IKKr)
+Rule('dn_adc', IkBd(ikk=None, nfkb=None, S='C') + NFkB(ikb=None, S='C') <> IkBd(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C'), IkB_IKKf, IkB_IKKr)
 
+Rule('an_adn', IkBa(ikk=None, nfkb=None, S='N') + NFkB(ikb=None, S='N') <> IkBa(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), IkB_IKKf, IkB_IKKr)
+Rule('bn_adn', IkBb(ikk=None, nfkb=None, S='N') + NFkB(ikb=None, S='N') <> IkBb(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), IkB_IKKf, IkB_IKKr)
+Rule('en_adn', IkBe(ikk=None, nfkb=None, S='N') + NFkB(ikb=None, S='N') <> IkBe(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), IkB_IKKf, IkB_IKKr)
+Rule('dn_adn', IkBd(ikk=None, nfkb=None, S='N') + NFkB(ikb=None, S='N') <> IkBd(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), IkB_IKKf, IkB_IKKr)
 
 
 # #IkB and NFkB cellular localization reactions
 
 Parameter('af', 0.09)
-Parameter('ncf', 0.012)
 Parameter('bf', 0.009)
 Parameter('ef', 0.045)
+Parameter('df', 0.045)
+Parameter('ancf', 0.012)
+Parameter('bncf', 0.012)
+Parameter('encf', 0.012)
+Parameter('dncf', 0.012)
+Rule('a_nc', IkBa(ikk=None, nfkb=None, S='C') <> IkBa(ikk=None, nfkb=None, S='N'), af, ancf)
+Rule('b_nc', IkBb(ikk=None, nfkb=None, S='C') <> IkBb(ikk=None, nfkb=None, S='N'), bf, bncf)
+Rule('e_nc', IkBe(ikk=None, nfkb=None, S='C') <> IkBe(ikk=None, nfkb=None, S='N'), ef, encf)
+Rule('d_nc', IkBd(ikk=None, nfkb=None, S='C') <> IkBd(ikk=None, nfkb=None, S='N'), ef, dncf)
+
 Parameter('anf', 0.276)
-Parameter('anr', 0.828)
 Parameter('bnf', 0.0276)
-Parameter('bnr', 0.414)
 Parameter('enf', 0.138)
 Parameter('dnf', 0.276)
+Parameter('anr', 0.828)
+Parameter('bnr', 0.414)
+Parameter('enr', 0.414)
+Parameter('dnr', 0.414)
+Rule('an_nc', IkBa(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') <> IkBa(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), anf, anr)
+Rule('bn_nc', IkBb(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') <> IkBb(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), bnf, bnr)
+Rule('en_nc', IkBe(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') <> IkBe(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), enf, enr)
+Rule('dn_nc', IkBd(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') <> IkBd(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N'), dnf, dnr)
+
 Parameter('nf', 5.4)
 Parameter('nr', 0.0048)
-
-Rule('a_nc', IkBa(b=None, c=None, S='C') <> IkBa(b=None, c=None, S='N'), af, ncf)
-Rule('b_nc', IkBb(b=None, c=None, S='C') <> IkBb(b=None, c=None, S='N'), bf, ncf)
-Rule('e_nc', IkBe(b=None, c=None, S='C') <> IkBe(b=None, c=None, S='N'), ef, ncf)
-Rule('d_nc', IkBd(b=None, c=None, S='C') <> IkBd(b=None, c=None, S='N'), ef, ncf)
-
-Rule('an_nc', IkBa(b=1, c=None, S='C')%NFkB(b=1, S='C') <> IkBa(b=1, c=None, S='N')%NFkB(b=1, S='N'), anf, anr)
-Rule('bn_nc', IkBb(b=1, c=None, S='C')%NFkB(b=1, S='C') <> IkBb(b=1, c=None, S='N')%NFkB(b=1, S='N'), bnf, bnr)
-Rule('en_nc', IkBe(b=1, c=None, S='C')%NFkB(b=1, S='C') <> IkBe(b=1, c=None, S='N')%NFkB(b=1, S='N'), enf, bnr)
-Rule('dn_nc', IkBd(b=1, c=None, S='C')%NFkB(b=1, S='C') <> IkBd(b=1, c=None, S='N')%NFkB(b=1, S='N'), dnf, bnr)
-
-Rule('n_nc', NFkB(b=None, S='C') <> NFkB(b=None, S='N'), nf, nr)
+Rule('n_nc', NFkB(ikb=None, S='C') <> NFkB(ikb=None, S='N'), nf, nr)
 
 # IkB Protein Degradation Reactions
 
-Parameter('a_d', 0.12)
-Parameter('be_d', 0.18)
-Parameter('d_d', 0.0014)
+Parameter('a_dc', 0.12)
+Parameter('b_dc', 0.18)
+Parameter('e_dc', 0.18)
+Parameter('d_dc', 0.0014)
+Parameter('a_dn', 0.12)
+Parameter('b_dn', 0.18)
+Parameter('e_dn', 0.18)
+Parameter('d_dn', 0.0014)
 
-Rule('ad_c', IkBa(b=None, S='C') >> None, a_d)
-Rule('bd_c', IkBb(b=None, S='C') >> None, be_d)
-Rule('ed_c', IkBe(b=None, S='C') >> None, be_d)
-Rule('dd_c', IkBd(b=None, S='C') >> None, d_d)
+Rule('ad_c', IkBa(ikk=None, nfkb=None, S='C') >> None, a_dc)
+Rule('bd_c', IkBb(ikk=None, nfkb=None, S='C') >> None, b_dc)
+Rule('ed_c', IkBe(ikk=None, nfkb=None, S='C') >> None, e_dc)
+Rule('dd_c', IkBd(ikk=None, nfkb=None, S='C') >> None, d_dc)
 
-Rule('ad_n', IkBa(b=None, S='N') >> None, a_d)
-Rule('bd_n', IkBb(b=None, S='N') >> None, be_d)
-Rule('ed_n', IkBe(b=None, S='N') >> None, be_d)
-Rule('dd_n', IkBd(b=None, S='N') >> None, d_d)
+Rule('ad_n', IkBa(ikk=None, nfkb=None, S='N') >> None, a_dn)
+Rule('bd_n', IkBb(ikk=None, nfkb=None, S='N') >> None, b_dn)
+Rule('ed_n', IkBe(ikk=None, nfkb=None, S='N') >> None, e_dn)
+Rule('dd_n', IkBd(ikk=None, nfkb=None, S='N') >> None, d_dn)
 
 Parameter('c_bn', 0.00006)
 Parameter('n_bn', 0.00006)
 
-Rule('an_c', IkBa(b=1, S='C')%NFkB(b=1, S='C') >> NFkB(b=None, S='C'), c_bn)
-Rule('bn_c', IkBb(b=1, S='C')%NFkB(b=1, S='C') >> NFkB(b=None, S='C'), c_bn)
-Rule('en_c', IkBe(b=1, S='C')%NFkB(b=1, S='C') >> NFkB(b=None, S='C'), c_bn)
-Rule('dn_c', IkBd(b=1, S='C')%NFkB(b=1, S='C') >> NFkB(b=None, S='C'), c_bn)
+Rule('an_c', IkBa(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
+Rule('bn_c', IkBb(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
+Rule('en_c', IkBe(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
+Rule('dn_c', IkBd(ikk=None, nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
 
-Rule('an_n', IkBa(b=1, S='N')%NFkB(b=1, S='N') >> NFkB(b=None, S='N'), n_bn)
-Rule('bn_n', IkBb(b=1, S='N')%NFkB(b=1, S='N') >> NFkB(b=None, S='N'), n_bn)
-Rule('en_n', IkBe(b=1, S='N')%NFkB(b=1, S='N') >> NFkB(b=None, S='N'), n_bn)
-Rule('dn_n', IkBd(b=1, S='N')%NFkB(b=1, S='N') >> NFkB(b=None, S='N'), n_bn)
+Rule('an_n', IkBa(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N') >> NFkB(ikb=None, S='N'), n_bn)
+Rule('bn_n', IkBb(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N') >> NFkB(ikb=None, S='N'), n_bn)
+Rule('en_n', IkBe(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N') >> NFkB(ikb=None, S='N'), n_bn)
+Rule('dn_n', IkBd(ikk=None, nfkb=1, S='N')%NFkB(ikb=1, S='N') >> NFkB(ikb=None, S='N'), n_bn)
 
 Parameter('a2_2', 0.0018)
 Parameter('b2_2', 0.0006)
 Parameter('ed21_21', 0.0012)
 
-Rule('a2_c', IkBa(b=1, S='C')%IKK2(b=1, S='C') >> IKK2(b=None, S='C'), a2_2)
-Rule('b2_c', IkBb(b=1, S='C')%IKK2(b=1, S='C') >> IKK2(b=None, S='C'), b2_2)
-Rule('e2_c', IkBe(b=1, S='C')%IKK2(b=1, S='C') >> IKK2(b=None, S='C'), ed21_21)
-Rule('d1_c', IkBd(b=1, S='C')%IKK1(b=1, S='C') >> IKK1(b=None, S='C'), ed21_21)
+Rule('a2_c', IkBa(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C') >> IKK2(ikb=None, S='C'), a2_2)
+Rule('b2_c', IkBb(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C') >> IKK2(ikb=None, S='C'), b2_2)
+Rule('e2_c', IkBe(ikk=1, nfkb=None, S='C')%IKK2(ikb=1, S='C') >> IKK2(ikb=None, S='C'), ed21_21)
+Rule('d1_c', IkBd(ikk=1, nfkb=None, S='C')%IKK1(ikb=1, S='C') >> IKK1(ikb=None, S='C'), ed21_21)
 
 Parameter('an2_2n', 0.36)
 Parameter('bn2_2n', 0.12)
 Parameter('edn21_21n', 0.18)
 
-Rule('a2n_2nc', IkBa(b=None, c=2, S='C')%NFkB(b=1, S='C')%IKK2(b=1, c=2, S='C') >> IKK2(b=None, c=None, S='C') + NFkB(b=None, S='C'), an2_2n)
-Rule('b2n_2nc', IkBb(b=None, c=2, S='C')%NFkB(b=1, S='C')%IKK2(b=1, c=2, S='C') >> IKK2(b=None, c=None, S='C') + NFkB(b=None, S='C'), bn2_2n)
-Rule('e2n_2nc', IkBe(b=None, c=2, S='C')%NFkB(b=1, S='C')%IKK2(b=1, c=2, S='C') >> IKK2(b=None, c=None, S='C') + NFkB(b=None, S='C'), edn21_21n)
-Rule('d1n_1nc', IkBd(b=None, c=2, S='C')%NFkB(b=1, S='C')%IKK1(b=1, c=2, S='C') >> IKK1(b=None, c=None, S='C') + NFkB(b=None, S='C'), edn21_21n)
+Rule('a2n_2nc', IkBa(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK2(ikb=2, S='C') >> IKK2(ikb=None, S='C') + NFkB(ikb=None, S='C'), an2_2n)
+Rule('b2n_2nc', IkBb(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK2(ikb=2, S='C') >> IKK2(ikb=None, S='C') + NFkB(ikb=None, S='C'), bn2_2n)
+Rule('e2n_2nc', IkBe(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK2(ikb=2, S='C') >> IKK2(ikb=None, S='C') + NFkB(ikb=None, S='C'), edn21_21n)
+Rule('d1n_1nc', IkBd(ikk=2, nfkb=1, S='C')%NFkB(ikb=1, S='C')%IKK1(ikb=2, S='C') >> IKK1(ikb=None, S='C') + NFkB(ikb=None, S='C'), edn21_21n)
 
-generate_network(model)
-generate_equations(model)
 
-for i,ode in enumerate(model.odes):
-     print i,":",ode
 
-for i,reactions in enumerate(model.reactions):
-     print i,":",reactions
+#Dictionary to substitute in species names to match matlab files
+species_dict = {
+    0: 'IKK1',
+    1: 'IKK',
+    2: 'NFkBn',
+    3: 'SOURCE',
+    4: 'IkBat',
+    5: 'IkBbt',
+    6: 'IkBet',
+    7: 'IkBdt',
+    8: 'NFkB',
+    9: 'SINK',
+    10: 'IkBa',
+    11: 'IkBb',
+    12: 'IkBe',
+    13: 'IkBd',
+    14: 'IkBaIKK',
+    15: 'IkBbIKK',
+    16: 'IkBeIKK',
+    17: 'IkBdIKK1',
+    18: 'IkBaNFkB',
+    19: 'IkBbNFkB',
+    20: 'IkBeNFkB',
+    21: 'IkBdNFkB',
+    22: 'IkBan',
+    23: 'IkBbn',
+    24: 'IkBen',
+    25: 'IkBdn',
+    26: 'IkBaIKKNFkB',
+    27: 'IkBbIKKNFkB',
+    28: 'IkBeIKKNFkB',
+    29: 'IkBdIKK1NFkB',
+    30: 'IkBaNFkBn',
+    31: 'IkBbNFkBn',
+    32: 'IkBeNFkBn',
+    33: 'IkBdNFkBn'
+}
 
-if __name__ == "__main__":
-    generate_equations(model, verbose = True)
+#updating the species names in the odes
+for  ode in model.odes:
+    for i in range(len(model.species)):
+       ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
+    print ode
 
-    time = np.linspace(0, 1800, 181)
-    x = odesolve(model, time, verbose=True) #integrator='lsoda'
+#equilibrium phase 1 of model using odesolve
+time_equil = np.linspace(-8000, 0, 8001)
+equil = odesolve(model, time_equil, verbose=True)
+last_conc = [equil[x][-1] for x in ['__s%d' %i for i in np.arange(len(model.species))]]
+print(last_conc)#setting previous conc species equal to none
 
-    plt.figure()
-    plt.plot(time/60, x["NFkBn"], label=NFkBn)
-    plt.xlabel("Time (in minutes)", fontsize=16)
-    plt.ylabel("Concentration", fontsize=16)
-    plt.legend()
+#phase 2 of model using Solver
+tspan = np.linspace(0, 720, 721)
+solver = Solver(model,tspan,verbose=True)
 
-    plt.show()
+# ikk2_vals = []
+nsims = len(tspan) - 1 #simulation time is 720
+# yobs = np.empty((nsims, len(model.observables)))
+rows = len(tspan) # nSims
+cols = len(model.observables) #length of observables
+yobs = np.empty((rows, cols)) #creating empty array of R and C
+
+assert model.observables[1].name == 'IKK2_obs'
+assert str(model.species[1]) == "IKK2(ikb=None, S='C')"
+
+# print(model.parameters['IKK2_0'].value)
+#using imported IKK2 values during phase 2 simulation
+for i in range(nsims):
+    print(i) #printing each simulation iteration
+    last_conc[1] = ikk2[i]
+    solver.tspan = [tspan[i], tspan[i+1]] #simulating in 2 step intervals
+    solver.run(y0 = last_conc) #setting initial concentrations to previous simulation value (equil phase 1)
+    # print(last_conc)
+    if i == 0:
+        yobs[0, :] = solver.yobs_view[0]
+    yobs[i + 1 , :] = solver.yobs_view[1] #taking each simulation index and all obs and keeping the last obs in last time point of simulation
+    last_conc = solver.y[1,:] # running solver taking first row and all simulation species
+
+
+#plotting NFkBn free
+plt.figure(1)
+plt.plot(tspan/60., yobs[:,0], label= NFkBn_free.name)
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.legend(loc=0)
+
+#plotting NFkBc free
+plt.figure(2)
+plt.plot(tspan/60., yobs[:,2], label= NFkBc_free.name)
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.legend(loc=0)
+
+#plotting IkBa unbound cytosol
+plt.figure(2)
+plt.plot(tspan/60., yobs[:,10], label= IkBa_obs.name)
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.legend(loc=0)
+
+
+plt.show()
+
+
+
