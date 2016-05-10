@@ -161,7 +161,7 @@ Rule('NFkBn_and_IkBa_off', NFkB(b = None, loc = 'n') + IkBa_gene(state = 'off') 
 if __name__ == "__main__":
     generate_equations(model, verbose = True)
 
-    time = np.linspace(0, 18000, 1801)
+    time = np.linspace(0, 1800, 101)
     x = odesolve(model, time, verbose=True) #integrator='lsoda',
 
 
@@ -272,24 +272,24 @@ if __name__ == "__main__":
     # plt.xticks(fontsize=10)
     # plt.yticks(fontsize=10)
 
-    plt.figure(10)
-    for obs in ["A20_obs"]: #, "IkBat_obs"]:
-        plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
-        plt.legend(loc=0, prop={'size': 16})
-    plt.xlabel("Time (in minutes)", fontsize=16)
-    plt.ylabel("Concentrations", fontsize=16)
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
-
-    plt.show()
-
-    #
-    # x = odesolve(model, time, verbose=True)
-    # plt.figure(4)
-    # plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
+    # plt.figure(10)
+    # for obs in ["A20_obs"]: #, "IkBat_obs"]:
+    #     plt.plot(time/60., x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+    #     plt.legend(loc=0, prop={'size': 16})
     # plt.xlabel("Time (in minutes)", fontsize=16)
-    # plt.ylabel("Concentration", fontsize=16)
-    # plt.legend()
+    # plt.ylabel("Concentrations", fontsize=16)
+    # plt.xticks(fontsize=10)
+    # plt.yticks(fontsize=10)
+    #
+    # plt.show()
+
+
+    # x = odesolve(model, time, verbose=True)
+    plt.figure(4)
+    plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
+    plt.xlabel("Time (in minutes)", fontsize=16)
+    plt.ylabel("Concentration", fontsize=16)
+    plt.legend()
     #
     # plt.figure(5)
     # plt.plot(time/60, x["IkBa_off_obs"], label=IkBa_off_obs)
@@ -303,8 +303,278 @@ if __name__ == "__main__":
     # plt.ylabel("Concentration", fontsize=16)
     # plt.legend()
 
-    # plt.show()
+    plt.show()
 
     # generate_equations(model, verbose = True)
     # for i,ode in enumerate(model.odes):
     #     print i,":",ode
+
+
+
+    # yobs = pd.DataFrame(array,columns=[str(i) for i in model.observables])
+# yobs = pd.DataFrame(array,columns=[str(i) for i in model.observables])
+# print yobs
+# yobs = pd.DataFrame(array,columns=['observable'+str(a) for a in range(cols)]) #creating panda data frame for labeling of array
+
+# print (yobs.shape)
+# yobs = pd.DataFrame(index = nsims, columns = len(model.observables))
+# model.parameters['IKK2_0'].value = pchip_obj1[0]
+    # last_conc[1] = ikk2[i+1] #updating IKK2 values using matlab IKK2 array values (pchip interpolation)
+    # last_conc[1] = pchip_obj1[i] #updating IKK2 interpolated values over each simulation
+    # if i == 0:
+    #     array[0,:] = solver.y[0]
+    # array[i+1 ,:] = solver.y[1] #taking each simulation index and all obs and keeping the last obs in last time point of simulation
+        # array[0,:] = solver.yobs_view[0]
+    # array[i+1 ,:] = solver.yobs_view[1] #taking each simulation index and all obs and keeping the last obs in last time point of simulation
+    # print(solver.yobs_view[1])
+    # ikk2_vals.append(solver.yobs_view[0][1])
+
+
+
+# plt.figure('IkBa_P2')
+# for obs in ["IkBa_mRNA_obs"]:
+#     plt.plot(tspan/60., array[:,4], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+# plt.figure('IkBb_P2')
+# for obs in ["IkBb_mRNA_obs"]:
+#     plt.plot(tspan/60., array[:,5], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+# plt.figure('IkBe_P2')
+# for obs in ["IkBe_mRNA_obs"]:
+#     plt.plot(tspan/60., array[:,6], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+# plt.figure('IkBd_P2')
+# for obs in ["IkBd_mRNA_obs"]:
+#     plt.plot(tspan/60., array[:,7], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+# print(ikk2_vals)
+# print(myarray)
+
+# plt.figure('IkB_P2')
+# for obs in ["IkBa_obs", "IkBb_obs", "IkBe_obs", "IkBd_obs"]:
+#     plt.plot(tspan/60., array[:,[]], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+
+
+
+
+# for i,ode in enumerate(model.odes):
+#      print i,":",ode
+
+# for i,obs in enumerate(model.observables):
+#      print i,":",obs
+#
+# for i,sp in enumerate(model.species):
+#      print i,":",sp
+# #
+# # for i,reactions in enumerate(model.reactions):
+# #      print i,":",reactions
+# #
+# for i,parameters in enumerate(model.parameters):
+#      print i,":",parameters
+# if __name__ == "__main__":
+    # tspan = np.linspace(0, 720, 721)
+    # # print len(tspan)
+    # solver = Solver(model,tspan,verbose=True)
+    # generate_equations(model, verbose = True)
+
+
+# plt.figure()
+# plt.plot( time_equil, equil["NFkBn_free"], label = NFkBn_free.name)
+# plt.legend(loc = 0)
+#
+# # time = np.linspace(0,720, 721)
+# nsims = len(tspan) - 1 #simulation time is 720
+# # phase2 = odesolve(model, time, verbose=True)
+#
+# last_conc = [equil[x][-1] for x in ['__s%d' %i for i in np.arange(len(model.species))]]
+# assert model.observables[1].name == 'IKK2_obs'
+# assert str(model.species[1]) == "IKK2(ikb=None, S='C')"
+# for i in range(nsims):
+#     print(i)
+#     model.parameters['IKK2_0'].value = myarray[i]
+#     solver.run(y0 = last_conc) #setting initial concentrations to previous simulation value
+#     last_conc = solver.y[1,:] # running solver taking first row and all simulation observables
+#     last_conc[1] = myarray[i]
+# print(last_conc)
+    # print(i) #printing each simulation iteration
+
+
+
+# plt.figure()
+# plt.plot(time, phase2["IKK2_obs"], label = IKK2_obs.name)
+# plt.legend(loc = 0)
+#
+# plt.figure()
+# plt.plot(time, phase2["NFkBn_free"], label = NFkBn_free.name)
+# plt.legend(loc = 0)
+#
+
+# plt.figure('IkBa_equil')
+# for obs in ["IkBa_mRNA_obs"]:
+#     plt.plot(time_equil, equil[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+# plt.figure('IkBb_equil')
+# for obs in ["IkBb_mRNA_obs"]:
+#     plt.plot(time_equil, equil[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+# plt.figure('IkBe_equil')
+# for obs in ["IkBe_mRNA_obs"]:
+#     plt.plot(time_equil, equil[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+# plt.figure('IkBd_equil')
+# for obs in ["IkBd_mRNA_obs"]:
+#     plt.plot(time_equil, equil[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+
+#
+# plt.figure('IkB_P2')
+# for obs in ["IkBa_mRNA_obs", "IkBb_mRNA_obs", "IkBe_mRNA_obs", "IkBd_mRNA_obs"]:
+#     plt.plot(time/60., phase2[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+
+# plt.figure('IkB_total')
+# for obs in ["IkBa_obs", "IkBb_obs", "IkBe_obs", "IkBd_obs"]:
+#     plt.plot(time/60., phase2[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+#
+#
+# plt.figure('IkB_total_equil')
+# for obs in ["IkBa_obs", "IkBb_obs", "IkBe_obs", "IkBd_obs"]:
+#     plt.plot(np.linspace(-4000, 1, 4001), equil[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
+#     plt.legend(loc=0, prop={'size': 16})
+# plt.xlabel("Time (in minutes)", fontsize=16)
+# plt.ylabel("Concentrations", fontsize=16)
+# plt.xticks(fontsize=10)
+# plt.yticks(fontsize=10)
+
+# plt.figure(2)
+# plt.plot( np.linspace(-4000, 1, 4001), equil["IKK2_obs"], label = IKK2_obs.name)
+# plt.legend(loc = 0)
+
+
+
+# x = np.array([0, 5, 10, 15, 20, 25, 30, 260, 480, 2880], dtype = float)
+# y1 = np.array([0.01, 0.6, 1, 0.65, 0.5, 0.36, 0.2, 0.1, 0.03, 0.01], dtype = float)
+# # pchip_obj1 = interp1d(x,y1, kind='cubic')(tspan)
+# pchip_obj1 = scipy.interpolate.PchipInterpolator(x, y1)(tspan)
+# print(pchip_obj1)
+# print(result)
+# quit()
+# exit()
+# xi = np.arange(x[0],x[-1],0.01)
+# yi1 = pchip_obj1(xi)
+#
+# plt.figure(1)
+# plt.plot(tspan/60., array[:,2], label= NFkBn_obs.name)
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# plt.legend(loc=0)
+#
+# plt.figure(1)
+# plt.plot(tspan/60., array[:,3], label= NFkBn_bound.name)
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60., array[:,6], label= IkBa_obs.name)
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# plt.legend(loc=0)
+#
+#
+# plt.figure()
+# plt.plot(tspan/60., array[:,1], label= IKK2_obs.name)
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# plt.legend(loc=0)
+
+
+# print str(yi1)[0:-1]
+# plt.plot(xi,yi1)
+# plt.show()
+
+# if __name__ == "__main__":
+#     solver = Solver(model,time,verbose=True)
+#     generate_equations(model, verbose = True)
+#
+#     # time = np.linspace(0, 4000 + 12*60, 4721)
+#     time = np.linspace(0, 600, 601)
+#     x = solver.run()
+#     # x = odesolve(model, time, verbose=True) #integrator='lsoda'
+#
+#
+
+#     # plt.ylim(0, .125)
+#
+#     for i in x["NFkBn_free"]:
+#         print i
+#     print
+#     for i in x["NFkBn_bound"]:
+#         print i
+    # quit()
+#     plt.figure(2)
+#     plt.plot(time/60, x["IkBa_mRNA_obs"], label= IkBa_mRNA_obs)
+#     plt.xlabel("Time (in minutes)", fontsize=16)
+#     plt.ylabel("Concentration", fontsize=16)
+#     plt.legend()
+# #
+# #     plt.figure(2)
+# #     plt.plot(time/60, x["IkBa_obs"], label=IkBa_obs)
+# #     plt.xlabel("Time (in minutes)", fontsize=16)
+# #     plt.ylabel("Concentration", fontsize=16)
+# #     plt.legend()
+# # #
+# plt.show()
