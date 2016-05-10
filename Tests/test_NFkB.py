@@ -1,6 +1,7 @@
-from NFkB_Struct import model
-from pysb.integrate import odesolve
 import numpy as np
+from NFkB_Struct import model
+
+from pysb.integrate import odesolve
 
 
 def test_simulation():

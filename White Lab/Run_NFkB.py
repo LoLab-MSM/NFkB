@@ -1,30 +1,11 @@
 __author__ = 'geena'
-from pysb import *
-from pysb.integrate import odesolve
-from pysb.bng import run_ssa
-import matplotlib.pyplot as plt
-import numpy as np
-from sympy import sympify
-from pysb.bng import generate_equations
-from pysb.util import *
-from pysb.macros import *
-from pysb.bng import *
-from pysb.core import *
 from Model_NFkB import model as m1
 # from NFkB_Unstruct import model as m2
 
-from pysb import *
 from pysb.integrate import odesolve
-from pysb.bng import run_ssa
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy import sympify
-from pysb.bng import generate_equations
-from pysb.util import *
-from pysb.macros import *
-from pysb.bng import *
 from pysb.core import *
-from numpy import array
 
 Model ()
 
