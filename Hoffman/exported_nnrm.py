@@ -703,28 +703,28 @@ Observable('IKK_obs', IKK(bind=None))
 Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None, state='K63ub') % TRAF(brip=4, bciap=5, state='unmod') % cIAP(btraf = 5))
 
 
-generate_network(model)
-generate_equations(model)
+# generate_network(model)
+# generate_equations(model)
 
 # print(model.initials)
 
-tspan = np.linspace(0, 1440, 1441)
-x = odesolve(model,tspan,verbose=True)
-
-print("printing species length")
-print(len(model.species))
-
-print("printing reactions length")
-print(len(model.reactions))
-
-last_conc = [x[y][-1] for y in ['__s%d' %i for i in np.arange(len(model.species))]]
-print(last_conc)
-
-first_conc = [x[y][0] for y in ['__s%d' %i for i in np.arange(len(model.species))]]
-print(first_conc)
-
-for i,sp in enumerate(model.species):
-    print i,":", sp
+# tspan = np.linspace(0, 1440, 1441)
+# x = odesolve(model,tspan,verbose=True)
+#
+# print("printing species length")
+# print(len(model.species))
+#
+# print("printing reactions length")
+# print(len(model.reactions))
+#
+# last_conc = [x[y][-1] for y in ['__s%d' %i for i in np.arange(len(model.species))]]
+# print(last_conc)
+#
+# first_conc = [x[y][0] for y in ['__s%d' %i for i in np.arange(len(model.species))]]
+# print(first_conc)
+#
+# for i,sp in enumerate(model.species):
+#     print i,":", sp
 
 # print("IkBmrna conc")
 # print(x['IkBamrna'])
