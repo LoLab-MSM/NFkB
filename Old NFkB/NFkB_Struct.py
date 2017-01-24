@@ -158,11 +158,11 @@ Rule('IKKii_to_IKKn', IKK(state = 'ii') >> IKK(state = 'n'), k4) #IKKii creates 
 Rule('NFkBn_and_A20_off', NFkB(b = None, loc = 'n') + A20_gene(state = 'off') >> NFkB(b = None, loc = 'n') + A20_gene(state = 'on'), q1) #NFkB turning off A20 gene state
 Rule('NFkBn_and_IkBa_off', NFkB(b = None, loc = 'n') + IkBa_gene(state = 'off') >> NFkB(b = None, loc = 'n') + IkBa_gene(state = 'on'), q1) #NFkB turning off IkBa gene state
 
-if __name__ == "__main__":
-    generate_equations(model, verbose = True)
-
-    time = np.linspace(0, 1800, 101)
-    x = odesolve(model, time, verbose=True) #integrator='lsoda',
+# if __name__ == "__main__":
+#     generate_equations(model, verbose = True)
+#
+#     time = np.linspace(0, 1800, 101)
+#     x = odesolve(model, time, verbose=True) #integrator='lsoda',
 
 
     # for obs in ["IkBap_NFkBc_obs"]:
@@ -285,11 +285,11 @@ if __name__ == "__main__":
 
 
     # x = odesolve(model, time, verbose=True)
-    plt.figure(4)
-    plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
-    plt.xlabel("Time (in minutes)", fontsize=16)
-    plt.ylabel("Concentration", fontsize=16)
-    plt.legend()
+    # plt.figure(4)
+    # plt.plot(time/60, x["NFkBn_obs"], label='NFkBn')
+    # plt.xlabel("Time (in minutes)", fontsize=16)
+    # plt.ylabel("Concentration", fontsize=16)
+    # plt.legend()
     #
     # plt.figure(5)
     # plt.plot(time/60, x["IkBa_off_obs"], label=IkBa_off_obs)
@@ -303,7 +303,7 @@ if __name__ == "__main__":
     # plt.ylabel("Concentration", fontsize=16)
     # plt.legend()
 
-    plt.show()
+    # plt.show()
 
     # generate_equations(model, verbose = True)
     # for i,ode in enumerate(model.odes):

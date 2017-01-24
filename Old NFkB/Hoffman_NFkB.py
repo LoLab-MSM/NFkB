@@ -14,7 +14,7 @@ import scipy.interpolate
 Model ()
 
 result = []
-with open('_diswitch.txt','r') as inputFile:
+with open('Old NFkB/_diswitch.txt','r') as inputFile:
     for line in inputFile:
         result.append(float(line))
 ikk2 = np.asarray(result)
@@ -335,6 +335,14 @@ for  ode in model.odes:
 #equilibrium phase 1 of model using odesolve
 time_equil = np.linspace(-8000, 0, 8001)
 equil = odesolve(model, time_equil, verbose=True)
+
+plt.figure(1)
+plt.plot(time_equil/60., equil['NFkBn_free']*1000, label= NFkBn_free.name)
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+plt.ylim(ymin = 0, ymax =100)
+plt.legend(loc=0)
+
 last_conc = [equil[x][-1] for x in ['__s%d' %i for i in np.arange(len(model.species))]]
 print(last_conc)#setting previous conc species equal to none
 
@@ -368,24 +376,25 @@ for i in range(nsims):
 
 #plotting NFkBn free
 plt.figure(1)
-plt.plot(tspan/60., yobs[:,0], label= NFkBn_free.name)
+plt.plot(tspan/60., yobs[:,0]*1000, label= NFkBn_free.name)
 plt.xlabel("Time (in hours)", fontsize=16)
 plt.ylabel("Concentration", fontsize=16)
+plt.ylim(ymin = 0, ymax =100)
 plt.legend(loc=0)
 
-#plotting NFkBc free
-plt.figure(2)
-plt.plot(tspan/60., yobs[:,2], label= NFkBc_free.name)
-plt.xlabel("Time (in hours)", fontsize=16)
-plt.ylabel("Concentration", fontsize=16)
-plt.legend(loc=0)
-
-#plotting IkBa unbound cytosol
-plt.figure(2)
-plt.plot(tspan/60., yobs[:,10], label= IkBa_obs.name)
-plt.xlabel("Time (in hours)", fontsize=16)
-plt.ylabel("Concentration", fontsize=16)
-plt.legend(loc=0)
+# #plotting NFkBc free
+# plt.figure(2)
+# plt.plot(tspan/60., yobs[:,2], label= NFkBc_free.name)
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# plt.legend(loc=0)
+#
+# #plotting IkBa unbound cytosol
+# plt.figure(2)
+# plt.plot(tspan/60., yobs[:,10], label= IkBa_obs.name)
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# plt.legend(loc=0)
 
 
 plt.show()

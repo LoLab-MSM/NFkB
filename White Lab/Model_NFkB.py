@@ -11,6 +11,9 @@ from pysb.integrate import odesolve
 from pysb.bng import run_ssa
 import matplotlib.pyplot as plt
 import numpy as np
+from pysb.kappa import contact_map, set_kappa_path, influence_map
+from pysb.tools.render_reactions import run
+import pygraphviz as pyg
 
 
 Model ()
@@ -157,3 +160,12 @@ Rule('IkBan_and_IkBa_on', IkBa(b = None, phos = 'u', loc = 'n') + IkBa_gene(stat
 Rule('IKKii_to_IKKn', IKK(state = 'ii') >> IKK(state = 'n'), k4) #IKKii creates IKKn
 Rule('NFkBn_and_A20_off', NFkB(b = None, loc = 'n') + A20_gene(state = 'off') >> NFkB(b = None, loc = 'n') + A20_gene(state = 'on'), q1) #NFkB turning off A20 gene state
 Rule('NFkBn_and_IkBa_off', NFkB(b = None, loc = 'n') + IkBa_gene(state = 'off') >> NFkB(b = None, loc = 'n') + IkBa_gene(state = 'on'), q1) #NFkB turning off IkBa gene state
+
+
+set_kappa_path('/Users/geenaildefonso/Projects/KaSim')
+x = contact_map(model)
+x.draw('contact_map.pdf', format='pdf', prog='dot')
+
+x = run(model)
+g = pyg.AGraph(x)
+g.draw('render_reactions.pdf', format='pdf', prog='dot')
