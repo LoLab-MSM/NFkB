@@ -33,7 +33,7 @@ var_names = ['ikba_var', 'ikbb_var','ikbe_var','ikbd_var']
 # print(var_names)
 # Total starting amounts of proteins in obs_names, for normalizing simulations
 obs_totals = [model.parameters['IkBa_0'].value, model.parameters['IkBb_0'].value, model.parameters['IkBe_0'].value, model.parameters['IkBd_0'].value]
-exp_data = np.genfromtxt('/Users/geenaildefonso/nfkbn_data.csv', delimiter=',', names=True)
+exp_data = np.genfromtxt('nfkbn_data.csv', delimiter=',', names=True)
 
 ntimes = len(exp_data['Time'])
 tmul = 10
