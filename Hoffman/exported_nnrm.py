@@ -25,7 +25,7 @@ Monomer('MLKL', ['bRHIM', 'state'], {'state': ['unmod', 'active', 'inactive']})
 Monomer('TAK1', ['brip', 'bmapk'])
 Monomer('NEMO', ['brip', 'btak', 'bikk'])
 Monomer('LUBAC', ['brip'])
-Monomer('IKK', ['bind'])
+Monomer('IKK', ['bind', 'bnemo'])
 Monomer('MAPK', ['btak', 'state'], {'state': ['inactive', 'active']})
 Monomer('NFkB', ['ikb', 'loc'], {'loc': ['C', 'N']})
 Monomer('IkBa', ['ikk', 'nfkb', 'loc', 'state'], {'loc': ['C', 'N'], 'state': ['inactive', 'active', 'phos']})
@@ -45,24 +45,6 @@ Parameter('bind_C8A_CYLDU_to_C8ACYLDU_kf', 1e-06)
 Parameter('bind_C8A_CYLDU_to_C8ACYLDU_kr', 0.001)
 Parameter('catalyze_C8ACYLDU_to_C8A_CYLDT_kc', 0.1)
 # Parameter('TNF_0', 23500.0)
-Parameter('TNF_0', 200) #698 is 30ng/ml of TNF
-Parameter('TNFR_0', 47000.0)
-Parameter('TRADD_0', 70000.0)
-Parameter('RIP1_0', 47000.0) #47000
-Parameter('TRAF_0', 47000.0)
-Parameter('cIAP_0', 10000.0)
-Parameter('A20_0', 2256.0)
-Parameter('CYLD_0', 50000.0) #50000
-Parameter('TAK1_0', 9000.0)
-Parameter('NEMO_0', 10000.0)
-Parameter('LUBAC_0', 10000.0)
-Parameter('IKK_0', 75000.0)
-Parameter('NFkBn_0', 1000.0) #100,000
-Parameter('IkBa_0', 1000.0)
-Parameter('IkBb_0', 1000.0)
-Parameter('IkBe_0', 1000.0)
-Parameter('IkBd_0', 1000.0)
-Parameter('MAPK_0', 10000.0)
 Parameter('bind_TNF_TNFR_kf', 1e-06)
 Parameter('bind_TNF_TNFR_kr', 0.001)
 Parameter('bind_TNFRANY_TRADD_kf', 1e-06)
@@ -161,6 +143,24 @@ Initial(IkBe_mRNA(), IkBet_0)
 Parameter('IkBdt_0', 1) #IkBa .0001
 Initial(IkBd_mRNA(), IkBdt_0)
 
+Parameter('TNF_0', 200) #698 is 30ng/ml of TNF
+Parameter('TNFR_0', 47000.0)
+Parameter('TRADD_0', 70000.0)
+Parameter('RIP1_0', 47000.0) #47000
+Parameter('TRAF_0', 47000.0)
+Parameter('cIAP_0', 10000.0)
+Parameter('A20_0', 2256.0)
+Parameter('CYLD_0', 50000.0) #50000
+Parameter('TAK1_0', 9000.0)
+Parameter('NEMO_0', 10000.0)
+Parameter('LUBAC_0', 10000.0)
+Parameter('IKK_0', 75000.0)
+Parameter('NFkBn_0', 1000.0) #100,000
+Parameter('IkBa_0', 100)
+Parameter('IkBb_0', 100)
+Parameter('IkBe_0', 100)
+Parameter('IkBd_0', 100)
+Parameter('MAPK_0', 10000.0)
 Initial(TNF(brec=None), TNF_0)
 Initial(TNFR(blig=None, brip=None, bDD = None), TNFR_0)
 Initial(TRADD(brec=None, brip=None, state='unmod', bDD1 = None, bDD2 = None), TRADD_0)
@@ -172,7 +172,7 @@ Initial(CYLD(brip=None, btraf = None), CYLD_0)
 Initial(TAK1(brip=None, bmapk=None), TAK1_0)
 Initial(NEMO(brip=None, btak=None, bikk=None), NEMO_0)
 Initial(LUBAC(brip=None), LUBAC_0)
-Initial(IKK(bind=None), IKK_0)
+Initial(IKK(bind=None, bnemo = None), IKK_0)
 Initial(NFkB(ikb=None, loc='N'), NFkBn_0)
 Initial(IkBa(ikk=None, nfkb=None, loc='C', state='active'), IkBa_0)
 Initial(IkBb(ikk=None, nfkb=None, loc='C', state='active'), IkBb_0)
@@ -196,7 +196,7 @@ Parameter('flip_L_0', 39023.0)
 Parameter('C8_0', 100) #10000
 Parameter('RIP3_0', 20000.0) #20000
 # Parameter('MLKL_0', 10000.0) # 1000000
-# Parameter('MLKLa_0', 10000.0) # 100000
+Parameter('MLKLa_0', 10000.0) # 100000
 Initial(FADD(bDD=None, bDED1=None, bDED2=None), FADD_0)
 Initial(RIP3(bRHIM=None, bDD = None, state='unmod'), RIP3_0)
 Initial(flip_L(bDED=None), flip_L_0)
@@ -204,7 +204,7 @@ Initial(flip_L(bDED=None), flip_L_0)
 # Initial(proC8(bDED=None), proC8_0)
 Initial(C8(bf=None, state='I'), C8_0)
 # Initial(MLKL(bRHIM=None, state='unmod'), MLKL_0)
-# Initial(MLKL(bRHIM=None, state='active'), MLKLa_0)
+Initial(MLKL(bRHIM=None, state='active'), MLKLa_0)
 
 
 # TNF + TNFR <> TNF:TNFR
@@ -249,10 +249,10 @@ Rule('A20_1', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None,
 Rule('bind_RIP1K63ubANY_NEMO', RIP1(bub1 = None, bub2=None, bub3 = None, bDD = None, state='K63ub') + NEMO(brip=None) <> RIP1(bub1 = None, bub2=1, bub3 = None, bDD = None, state='K63ub') % NEMO(brip=1), bind_RIP1K63ubANY_NEMO_kf, bind_RIP1K63ubANY_NEMO_kr)
 Rule('bind_RIP1K63ubANY_TAK1', RIP1(bub1 = None, bub2=1, bub3 = None, bDD = None, state='K63ub') % NEMO(brip=1) + TAK1(brip=None) <> RIP1(bub1 = None, bub2=1, bub3 = 2, bDD = None, state='K63ub') % NEMO(brip=1) % TAK1(brip=2), bind_RIP1K63ubANY_TAK1_kf, bind_RIP1K63ubANY_TAK1_kr)
 Rule('bind_RIP1K63ubANYNEMO_LUBAC', RIP1(bub1 = None, bub2=1, bub3 = 2, bDD = None, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) + LUBAC(brip=None) <> RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = None, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3), bind_RIP1K63ubANYNEMO_LUBAC_kf, bind_RIP1K63ubANYNEMO_LUBAC_kr)
-Rule('bind_NEMORIP1TAK1_IKKinactive', RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = None, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) + IKK(bind=None) <> RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = 4, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) % IKK(bind=4), bind_NEMORIP1TAK1_IKKinactive_kf, bind_NEMORIP1TAK1_IKKinactive_kr)
+Rule('bind_NEMORIP1TAK1_IKKinactive', RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = None, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) + IKK(bind=None, bnemo = None) <> RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = 4, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) % IKK(bind=4, bnemo = None), bind_NEMORIP1TAK1_IKKinactive_kf, bind_NEMORIP1TAK1_IKKinactive_kr)
 # Rule('catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive', RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = 4, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) % IKK(bind=4) >> RIP1(bub1 = None, bub2=None, bub3 = None, bDD = None, state='K63ub') + NEMO(brip=None) + TAK1(brip=None) + LUBAC(brip=None) + IKK(bind=None), catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive_kc)
-Rule('catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive', RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = 4, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) % IKK(bind=4) >> IKK(bind=None), catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive_kc)
-
+# Rule('catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive', RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = 4, state='K63ub') % NEMO(brip=1) % TAK1(brip=2) % LUBAC(brip=3) % IKK(bind=4) >> IKK(bind=None), catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive_kc)
+Rule('catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive', RIP1(bub1 = 3, bub2=1, bub3 = 2, bDD = 4, state='K63ub') % NEMO(brip=1, bikk = None) % TAK1(brip=2) % LUBAC(brip=3) % IKK(bind=4, bnemo = None) >> NEMO(brip = None, bikk = 5) % IKK(bind=None, bnemo = 5), catalyze_NEMORIP1TAK1IKKinactive_to_NEMORIP1TAK1_IKKactive_kc)
 
 Rule('bind_TRADDANYRIP1ANY_FADD', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = None, state = 'deub') + FADD(bDD=None, bDED1 = None, bDED2 = None) <> RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=1, btraf=None, bMLKL = None, bRHIM = None, state = 'deub') % FADD(bDD=1,bDED1 = None, bDED2 = None), bind_TRADDANYRIP1ANY_FADD_kf, bind_TRADDANYRIP1ANY_FADD_kr)
 Rule('bind_FADDANY_proC8', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=1, btraf=None, bMLKL = None, bRHIM = None, state = 'deub') % FADD(bDD=1, bDED1 = None, bDED2 = None) + TRADD(brec = None, brip = None, bDD1=None, bDD2=None) <> RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=1, btraf=None, bMLKL = None, bRHIM = None, state = 'deub') % FADD(bDD=1, bDED1 = 2, bDED2 = None) % TRADD(brec = None, brip = None, bDD1=2, bDD2=None), bind_FADDANY_proC8_kf, bind_FADDANY_proC8_kr)
@@ -275,23 +275,23 @@ Rule('catalyze_RIP1po4MLKLunmod_to_RIP1po4_MLKLactive', RIP1(bscf = None, bub1 =
 
 Parameter('kr', 0.01)
 Parameter('kf', 0.1)
-# Rule('IKK_activate_IkBa', IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='active') <> IKK(bind=1) % IkBa(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
-# Rule('IKK_activate_IkBb', IKK(bind=None) + IkBb(ikk=None, nfkb=None, loc='C', state='active') <> IKK(bind=1) % IkBb(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
-# Rule('IKK_activate_IkBe', IKK(bind=None) + IkBe(ikk=None, nfkb=None, loc='C', state='active') <> IKK(bind=1) % IkBe(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
-# Rule('IKK_activate_IkBd', IKK(bind=None) + IkBd(ikk=None, nfkb=None, loc='C', state='active') <> IKK(bind=1) % IkBd(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
-# Rule('IKKIkBa_active', IKK(bind=1) % IkBa(ikk=1, nfkb=None, loc='C', state='active') >> IKK(bind=None, state='active') + IkBa(ikk=None, nfkb=None, loc='C', state='phos'), kf)
-# Rule('IKKIkBb_active', IKK(bind=1) % IkBa(ikk=1, nfkb=None, loc='C', state='active') >> IKK(bind=None, state='active') + IkBa(ikk=None, nfkb=None, loc='C', state='phos'), kf)
-# Rule('IKKIkBe_active', IKK(bind=1) % IkBa(ikk=1, nfkb=None, loc='C', state='active') >> IKK(bind=None, state='active') + IkBa(ikk=None, nfkb=None, loc='C', state='phos'), kf)
-# Rule('IKKIkBd_active', IKK(bind=1) % IkBa(ikk=1, nfkb=None, loc='C', state='active') >> IKK(bind=None, state='active') + IkBa(ikk=None, nfkb=None, loc='C', state='phos'), kf)
+Rule('IKK_activate_IkBa', NEMO(brip = None, bikk = 5) % IKK(bind=None, bnemo = 5) + IkBa(ikk=None, nfkb=None, loc='C', state='active') <> NEMO(brip = None, bikk = None) + IKK(bind=1, bnemo = None) % IkBa(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
+Rule('IKK_activate_IkBb', NEMO(brip = None, bikk = 5) % IKK(bind=None, bnemo = 5) + IkBb(ikk=None, nfkb=None, loc='C', state='active') <> NEMO(brip = None, bikk = None) + IKK(bind=1, bnemo = None) % IkBb(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
+Rule('IKK_activate_IkBe', NEMO(brip = None, bikk = 5) % IKK(bind=None, bnemo = 5) + IkBe(ikk=None, nfkb=None, loc='C', state='active') <> NEMO(brip = None, bikk = None) + IKK(bind=1, bnemo = None) % IkBe(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
+Rule('IKK_activate_IkBd', NEMO(brip = None, bikk = 5) % IKK(bind=None, bnemo = 5) + IkBd(ikk=None, nfkb=None, loc='C', state='active') <> NEMO(brip = None, bikk = None) + IKK(bind=1, bnemo = None) % IkBd(ikk=1, nfkb=None, loc='C', state='active'), kf, kr)
+Rule('IKKIkBa_active', IKK(bind=1, bnemo = None) % IkBa(ikk=1, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') >> IKK(bind=None, bnemo = None) + IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf)
+Rule('IKKIkBb_active', IKK(bind=1, bnemo = None) % IkBb(ikk=1, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') >> IKK(bind=None, bnemo = None) + IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf)
+Rule('IKKIkBe_active', IKK(bind=1, bnemo = None) % IkBe(ikk=1, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') >> IKK(bind=None, bnemo = None) + IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf)
+Rule('IKKIkBd_active', IKK(bind=1, bnemo = None) % IkBd(ikk=1, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') >> IKK(bind=None, bnemo = None) + IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf)
 
-Rule('IKK_activate_IkBa', IKK(bind=None) + IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
-Rule('IKK_activate_IkBb', IKK(bind=None) + IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBb(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
-Rule('IKK_activate_IkBe', IKK(bind=None) + IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBe(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
-Rule('IKK_activate_IkBd', IKK(bind=None) + IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBd(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
-Rule('IKKIkBa_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
-Rule('IKKIkBb_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
-Rule('IKKIkBe_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
-Rule('IKKIkBd_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
+# Rule('IKK_activate_IkBa', IKK(bind=None) + IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
+# Rule('IKK_activate_IkBb', IKK(bind=None) + IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBb(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
+# Rule('IKK_activate_IkBe', IKK(bind=None) + IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBe(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
+# Rule('IKK_activate_IkBd', IKK(bind=None) + IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IKK(bind=2) % IkBd(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), kf, kr)
+# Rule('IKKIkBa_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
+# Rule('IKKIkBb_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
+# Rule('IKKIkBe_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
+# Rule('IKKIkBd_active', IKK(bind=2) % IkBa(ikk=2, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> IKK(bind=None) + IkBa(ikk=None, nfkb=None, loc='C', state='phos') + NFkB(ikb=None, loc='C'), kf)
 
 
 Parameter('psynth_a', 7e-5)
@@ -358,14 +358,18 @@ Rule('d_psynth', IkBd_mRNA() >> IkBd(ikk=None, nfkb=None, loc='C', state='active
 
 Parameter('IkB_IKKf', 30.0)
 Parameter('IkB_IKKr', 6e-05)
-Rule('an_adc', IkBa(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
-Rule('bn_adc', IkBb(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
-Rule('en_adc', IkBe(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
-Rule('dn_adc', IkBd(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
-Rule('an_adn', IkBa(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
-Rule('bn_adn', IkBb(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
-Rule('en_adn', IkBe(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
-Rule('dn_adn', IkBd(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
+# Rule('an_adc', IkBa(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
+# Rule('bn_adc', IkBb(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
+# Rule('en_adc', IkBe(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
+# Rule('dn_adc', IkBd(ikk=None, nfkb=None, loc='C', state='active') + NFkB(ikb=None, loc='C') <> IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), IkB_IKKf, IkB_IKKr)
+# Rule('an_adn', IkBa(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
+# Rule('bn_adn', IkBb(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
+# Rule('en_adn', IkBe(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
+# Rule('dn_adn', IkBd(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') <> IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf, IkB_IKKr)
+Rule('an_adn', IkBa(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') >> IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf)
+Rule('bn_adn', IkBb(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') >> IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf)
+Rule('en_adn', IkBe(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') >> IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf)
+Rule('dn_adn', IkBd(ikk=None, nfkb=None, loc='N', state='active') + NFkB(ikb=None, loc='N') >> IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), IkB_IKKf)
 
 
 #IkB shuttling
@@ -406,10 +410,15 @@ Parameter('enr', 0.414)
 Parameter('dnr', 0.414)
 Parameter('nf', 5.4)
 Parameter('nr', 0.0048)
-Rule('an_nc', IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), anf, anr)
-Rule('bn_nc', IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), bnf, bnr)
-Rule('en_nc', IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), enf, enr)
-Rule('dn_nc', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), dnf, dnr)
+Rule('an_nc', IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), anr)
+Rule('bn_nc', IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), bnr)
+Rule('en_nc', IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), enr)
+Rule('dn_nc', IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'), dnr)
+# Rule('n_nc', NFkB(ikb=None, loc='C') >> NFkB(ikb=None, loc='N'), nf)
+# Rule('an_nc', IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), anf, anr)
+# Rule('bn_nc', IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), bnf, bnr)
+# Rule('en_nc', IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), enf, enr)
+# Rule('dn_nc', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') <> IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'), dnf, dnr)
 Rule('n_nc', NFkB(ikb=None, loc='C') <> NFkB(ikb=None, loc='N'), nf, nr)
 
 
@@ -431,14 +440,14 @@ Parameter('a_dn', 0.12)
 Parameter('b_dn', 0.18)
 Parameter('e_dn', 0.18)
 Parameter('d_dn', 0.0014)
-Rule('ad_c', IkBa(ikk=None, nfkb=None, loc='C', state='phos') >> None, a_dc)
-Rule('bd_c', IkBb(ikk=None, nfkb=None, loc='C', state='phos') >> None, b_dc)
-Rule('ed_c', IkBe(ikk=None, nfkb=None, loc='C', state='phos') >> None, e_dc)
-Rule('dd_c', IkBd(ikk=None, nfkb=None, loc='C', state='phos') >> None, d_dc)
-Rule('ad_n', IkBa(ikk=None, nfkb=None, loc='N', state='active') >> None, a_dn)
-Rule('bd_n', IkBb(ikk=None, nfkb=None, loc='N', state='active') >> None, b_dn)
-Rule('ed_n', IkBe(ikk=None, nfkb=None, loc='N', state='active') >> None, e_dn)
-Rule('dd_n', IkBd(ikk=None, nfkb=None, loc='N', state='active') >> None, d_dn)
+# Rule('ad_c', IkBa(ikk=None, nfkb=None, loc='C', state='phos') >> None, a_dc)
+# Rule('bd_c', IkBb(ikk=None, nfkb=None, loc='C', state='phos') >> None, b_dc)
+# Rule('ed_c', IkBe(ikk=None, nfkb=None, loc='C', state='phos') >> None, e_dc)
+# Rule('dd_c', IkBd(ikk=None, nfkb=None, loc='C', state='phos') >> None, d_dc)
+Rule('ad_n', IkBa(ikk=None, nfkb=None, loc='C', state='active') >> None, a_dn)
+Rule('bd_n', IkBb(ikk=None, nfkb=None, loc='C', state='active') >> None, b_dn)
+Rule('ed_n', IkBe(ikk=None, nfkb=None, loc='C', state='active') >> None, e_dn)
+Rule('dd_n', IkBd(ikk=None, nfkb=None, loc='C', state='active') >> None, d_dn)
 
 
 # IkBa : NFkB >> NFkB
@@ -456,10 +465,10 @@ Rule('an_c', IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='
 Rule('bn_c', IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> NFkB(ikb=None, loc='C'), c_bn)
 Rule('en_c', IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> NFkB(ikb=None, loc='C'), c_bn)
 Rule('dn_c', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> NFkB(ikb=None, loc='C'), c_bn)
-Rule('an_n', IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
-Rule('bn_n', IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
-Rule('en_n', IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
-Rule('dn_n', IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
+# Rule('an_n', IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
+# Rule('bn_n', IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
+# Rule('en_n', IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
+# Rule('dn_n', IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N') >> NFkB(ikb=None, loc='N'), n_bn)
 
 
 # TRADD + RIP1 <> TRADD:RIP1
@@ -669,12 +678,12 @@ Observable('Obs_ComplexII', TRADD(brec=None, brip=1) % RIP1(bscf=1, btraf=None, 
 Observable('TNFR_endocytosis', TNF(brec=3) % TNFR(blig=3) % RIP1(btraf=None, bub1=None, bub2=None, bub3=None, state='deub'))
 Observable('CYLD_CompI_1', RIP1(bscf=ANY, bub2=2, bub3=None, state='K63ub') % CYLD(brip=2))
 Observable('CYLD_CompI_2', RIP1(bscf=ANY, btraf=3, bub2=2, bub3=None, state='K63ub') % CYLD(brip=2) % TRAF(brip=3, state='K63ub'))
-Observable('NFkBn_obs', NFkB(ikb=ANY, loc='N'))
-Observable('NFkB_obs', NFkB(ikb=ANY, loc='C'))
-Observable('IkBa_obs', IkBa(ikk=None, nfkb=None, loc='C', state='active'))
-Observable('IkBb_obs', IkBb(ikk=None, nfkb=None, loc='C', state='active'))
-Observable('IkBe_obs', IkBe(ikk=None, nfkb=None, loc='C', state='active'))
-Observable('IkBd_obs', IkBd(ikk=None, nfkb=None, loc='C', state='active'))
+Observable('NFkBn_obs', NFkB(loc='N'))
+Observable('NFkB_obs', NFkB(loc='C'))
+Observable('IkBa_obs', IkBa(loc='C', state='active'))
+Observable('IkBb_obs', IkBb(loc='C', state='active'))
+Observable('IkBe_obs', IkBe(loc='C', state='active'))
+Observable('IkBd_obs', IkBd(loc='C', state='active'))
 Observable('IkBan_obs', IkBa(ikk=None, nfkb=None, loc='N', state='active'))
 Observable('IkBbn_obs', IkBb(ikk=None, nfkb=None, loc='N', state='active'))
 Observable('IkBen_obs', IkBe(ikk=None, nfkb=None, loc='N', state='active'))
@@ -702,15 +711,53 @@ Observable('IKK_obs', IKK(bind=None))
 # Observable('IKKany', IKK(bind = ANY))
 Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None, state='K63ub') % TRAF(brip=4, bciap=5, state='unmod') % cIAP(btraf = 5))
 
-
+#
 # generate_network(model)
 # generate_equations(model)
-
-# print(model.initials)
-
+#
+# # # print(model.initials)
+#
 # tspan = np.linspace(0, 1440, 1441)
 # x = odesolve(model,tspan,verbose=True)
 #
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBa_obs'], label="IkBa")
+# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# plt.xlabel("Time (in hr)", fontsize=16)
+# plt.ylabel("Molecules per Cell", fontsize=16)
+# # plt.ylim(ymin = 0, ymax = 0.00000008)
+# plt.legend(loc=0)
+# plt.title('IkBa')
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBb_obs'], label="IkBb")
+# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# plt.xlabel("Time (in hr)", fontsize=16)
+# plt.ylabel("Molecules per Cell", fontsize=16)
+# # plt.ylim(ymin = 0, ymax = 0.00000008)
+# plt.legend(loc=0)
+# plt.title('IkBb')
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBe_obs'], label="IkBe")
+# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# plt.xlabel("Time (in hr)", fontsize=16)
+# plt.ylabel("Molecules per Cell", fontsize=16)
+# # plt.ylim(ymin = 0, ymax = 0.00000008)
+# plt.legend(loc=0)
+# plt.title('IkBe')
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBd_obs'], label="IkBd")
+# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# plt.xlabel("Time (in hr)", fontsize=16)
+# plt.ylabel("Molecules per Cell", fontsize=16)
+# # plt.ylim(ymin = 0, ymax = 0.00000008)
+# plt.legend(loc=0)
+# plt.title('IkBd')
+# # plt.show()
+# #
 # print("printing species length")
 # print(len(model.species))
 #
@@ -725,15 +772,15 @@ Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % 
 #
 # for i,sp in enumerate(model.species):
 #     print i,":", sp
-
-# print("IkBmrna conc")
-# print(x['IkBamrna'])
 #
-# print('IKK conc')
-# print(x['IKK_obs'])
-# print(x['IKKany'])
-
-# # with PdfPages('multipage_pdf.pdf') as pdf:
+# # print("IkBmrna conc")
+# # print(x['IkBamrna'])
+# #
+# # print('IKK conc')
+# # print(x['IKK_obs'])
+# # print(x['IKKany'])
+#
+# # # with PdfPages('multipage_pdf.pdf') as pdf:
 # plt.figure()
 # plt.plot(tspan/60, x['CI'], label="CI")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
@@ -742,17 +789,17 @@ Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % 
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
 # plt.title('CI')
-#
-# plt.figure()
-# plt.plot(tspan/60, x['CI_k63_obs'], label="CI_k63")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 0.00000008)
-# plt.legend(loc=0)
-# plt.title('CI_k63')
-#
-#
+# #
+# # plt.figure()
+# # plt.plot(tspan/60, x['CI_k63_obs'], label="CI_k63")
+# # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# # plt.xlabel("Time (in hr)", fontsize=16)
+# # plt.ylabel("Molecules per Cell", fontsize=16)
+# # # plt.ylim(ymin = 0, ymax = 0.00000008)
+# # plt.legend(loc=0)
+# # plt.title('CI_k63')
+# #
+# #
 # plt.figure()
 # plt.plot(tspan/60, x['TNF_obs'], label="TNF")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
@@ -775,16 +822,6 @@ Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % 
 # # pdf.savefig()
 # # plt.close()
 #
-# plt.figure()
-# plt.plot(tspan/60, x['IkBa_obs'], label="IkBa")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 0.00000008)
-# plt.legend(loc=0)
-# plt.title('IkBa')
-# # pdf.savefig()
-# # plt.close()
 #
 # plt.figure()
 # plt.plot(tspan/60, x['RIP13po4_obs'], label="RIP13po4")
@@ -794,17 +831,26 @@ Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % 
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
 # plt.title('RIP13po4')
-# # pdf.savefig()
-# # plt.close()
-#
+# # # pdf.savefig()
+# # # plt.close()
+# #
 # plt.figure()
 # plt.plot(tspan/60, x['NFkB_obs'], label="NFkB")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
 # plt.xlabel("Time (in hr)", fontsize=16)
 # plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = .0002)
+# plt.ylim(ymin = 0, ymax = 1000)
 # plt.legend(loc=0)
 # plt.title('NFkB')
+#
+# # plt.figure()
+# # plt.plot(tspan/60, x['NFkBn_obs'], label="NFkBn")
+# # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# # plt.xlabel("Time (in hr)", fontsize=16)
+# # plt.ylabel("Molecules per Cell", fontsize=16)
+# # # plt.ylim(ymin = 0, ymax = .0002)
+# # plt.legend(loc=0)
+# # plt.title('NFkBn')
 # # pdf.savefig()
 # # plt.close()
 #
@@ -841,25 +887,25 @@ Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % 
 # plt.title('RIPk63')
 # #
 # plt.figure()
-# plt.plot(tspan/60, x['IKK'], label="IKK")
+# plt.plot(tspan/60, x['IKK_obs'], label="IKK")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
 # plt.xlabel("Time (in hr)", fontsize=16)
 # plt.ylabel("Molecules per Cell", fontsize=16)
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
 # plt.title('IKK')
-#
-# plt.figure()
-# plt.plot(tspan/60, x['IkBamrna'], label="IkBamrna")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 0.00000008)
-# plt.legend(loc=0)
-# plt.title('mrna')
-# # pdf.savefig()
-# # plt.close()
-#
+# #
+# # plt.figure()
+# # plt.plot(tspan/60, x['IkBamrna'], label="IkBamrna")
+# # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# # plt.xlabel("Time (in hr)", fontsize=16)
+# # plt.ylabel("Molecules per Cell", fontsize=16)
+# # # plt.ylim(ymin = 0, ymax = 0.00000008)
+# # plt.legend(loc=0)
+# # plt.title('mrna')
+# # # pdf.savefig()
+# # # plt.close()
+# #
 # plt.figure()
 # plt.plot(tspan/60, x['MLKLa_obs'], label="MLKLa")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
@@ -868,9 +914,9 @@ Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % 
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
 # plt.title('MLKLa')
-# # pdf.savefig()
-# # plt.close()
-#
+# pdf.savefig()
+# plt.close()
+
 # plt.show()
 
 
