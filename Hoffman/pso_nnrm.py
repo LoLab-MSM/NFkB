@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+
+
 import matplotlib, os, sys
 import numpy as np
 import pandas as pd
+# sys.path.append('/Users/geenaildefonso/Projects/ParticleSwarmOptimization')
 from simplepso.pso import PSO
 
 r = os.system('python -c "import matplotlib.pyplot as plt;plt.figure()"')
@@ -15,13 +18,14 @@ else:
 
     show = True
 
-from exported_nnrm import model
+# from exported_nnrm import model
+from old_hoffman_nfkb import model
 from pysb.integrate import Solver
 from pysb.simulator.scipyode import ScipyOdeSimulator
-
+show = False
 # you can do this in pycharm by right clicking on folder and
 # do "Mark directory as" and do "Source"
-sys.path.append('/Users/geenaildefonso/Projects/ParticleSwarmOptimization')
+
 
 # defining observable names from model to be used for calibration
 # data_names and var_names from csv data file for all time points
@@ -186,14 +190,14 @@ if __name__ == '__main__':
         os.mkdir(out_dir)
 
     # create 100 best fits parameter sets
-    for i in range(100):
+    for i in range(1000):
         pso_fn = PSO(save_sampled=False, verbose=False, num_proc=16)
-
+        print("running {}".format(i))
         pso_fn.set_cost_function(likelihood)
         pso_fn.set_start_position(xnominal)
         pso_fn.set_bounds(3)
         pso_fn.set_speed(-.25, .25)
-        pso_fn.run(50, 200)  # particles in swarm and iterations
+        pso_fn.run(100, 500)  # particles in swarm and iterations
         print("Iteration = {} : best value = {}".format(i, pso_fn.best.fitness.values[0]))
         csv_out = os.path.join(out_dir, 'best_fit_{}.csv'.format(i))
         fig_out = os.path.join(out_dir, 'best_fit_{}'.format(i))

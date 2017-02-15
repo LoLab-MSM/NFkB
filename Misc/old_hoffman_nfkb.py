@@ -10,7 +10,7 @@ import numpy as np
 from scipy import interpolate
 from scipy.interpolate import *
 import scipy.interpolate
-
+import numpy as np
 Model ()
 
 #Declaration of monomers
@@ -170,7 +170,7 @@ Parameter('IKKi_0', 0.0013) #TRADD-TRAF-RIP
 Initial(IKK(state = 'ai'), IKKi_0)
 
 
-Parameter('TNF_0', 0.196) #TNF
+Parameter('TNF_0', .2) #TNF
 Initial(TNF(c = None, tnfr = None), TNF_0)
 
 Parameter('TNFRM_0', 0.0) #TRADD-TRAF-RIP
@@ -207,34 +207,7 @@ Initial(A20t(), a20t_0)
 # Initial(TNF(c = None, tnfr = None), TNF_0)
 
 
-# Observable('IKKa_obs', IKK(state = 'a'))
-# Observable('IKKi_obs', IKK(state = 'i'))
-# Observable('IKKai_obs', IKK(state = 'ai'))
-# Observable('IKKKa_obs', IKKK(state = 'a'))
-# #RNA synthesis by NFkBn and Hill Coefficient
-#
-# # Observable('IkBa_mRNA_obs', IkBa_mRNA())
-# # Observable('IkBa_obs', IkBa(b=ANY, c=ANY, S=ANY))
-# #Observables for NFkB
-# # def observables():
 
-# # Observable('IKK2_obs', IKK2(ikb = None, S='C'))
-Observable('NFkBn_free', NFkB(ikb=None, S='N'))
-# Observable('NFkBn_obs', NFkB(ikb=WILD, S='N'))
-# Observable('NFkBn_bound', NFkB(ikb=ANY, S='N'))
-#
-# Observable('IkBa_mRNA_obs', IkBa_mRNA())
-# Observable('IkBb_mRNA_obs', IkBb_mRNA())
-# Observable('IkBe_mRNA_obs', IkBe_mRNA())
-# Observable('IkBd_mRNA_obs', IkBd_mRNA())
-#
-# Observable('TNF_obs', TNF(c = None, tnfr = None))
-# Observable('A20_obs', A20())
-
-# Observable('IkBa_obs', IkBa(ikk = None, nfkb = None, S='C'))
-# Observable('IkBb_obs', IkBb(ikk = WILD, nfkb = WILD, S=WILD))
-# Observable('IkBe_obs', IkBe(ikk = WILD, nfkb = WILD, S=WILD))
-# Observable('IkBd_obs', IkBd(ikk = WILD, nfkb = WILD, S=WILD))
 
 # def  ikb_mrna_to_ikb():
 Parameter('psynth_a', 7e-5)
@@ -251,6 +224,8 @@ Parameter('a', 8)
 Parameter('b', 0.02)
 Parameter('e', 0.3)
 Parameter('d', 0.025)
+
+Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 
 Expression('a_NFkBn', a*(NFkBn_free)**(hill))
 Expression('b_NFkBn', b*(NFkBn_free)**(hill))
@@ -436,7 +411,7 @@ Rule('deg_A20', A20() >> None, A20_deg)
 # def tnf_independent_to_c1():
 Parameter('synth_tnfrm', 2e-7)
 Parameter('deg_tnfrm', 0.0058)
-Parameter('tnfr_f_tnfrm', 2*1e-5)
+Parameter('tnfr_f_tnfrm', 6*1e-5) # times 2
 Parameter('tnfr_r_tnfrm', 0.1)
 Parameter('deg_TNFR', 0.023)
 Parameter('TNFR_TTR_f_C1', 100.0)
@@ -456,8 +431,16 @@ Parameter('C1_a_deg', 0.023)
 Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
 Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
 # Rule('TNFR_3tnfrm', TNFRM() + TNFRM() + TNFRM() <> TNFR(tnf = None), tnfr_f_tnfrm, tnfr_r_tnfrm)
+
+
 Rule('tnfrm3_to_TNFR', TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = None), tnfr_f_tnfrm)
 Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() + TNFRM() + TNFRM(), tnfr_r_tnfrm)
+
+# Rule('tnfrm3_to_TNFR', TNFRM()  >> TNFR(tnf = None), tnfr_f_tnfrm)
+# Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() , tnfr_r_tnfrm)
+
+
+
 Rule('TNFR_deg', TNFR(tnf = None) >> None, deg_TNFR)
 
 # tnfr + ttr <> C1_off[state = i]
@@ -477,7 +460,7 @@ Rule('C1a_deg', C1(tnf = None, state = 'a') >> None, C1_a_deg)
 #TNF-Dependent Complex 1 Activity Reactions
 # def tnf_dependent_to_c1():
 Parameter('tnf_deg', 0.0154)
-Parameter('tnf_tnfrm_f_TNFRtnf', 2*1100.0)
+Parameter('tnf_tnfrm_f_TNFRtnf', 6*1100.0) # times 2
 Parameter('tnf_TNFR_f_TNFRtnf', 1100.0)
 Parameter('tnf_TNFR_r_TNFRtnf', 0.021)
 Parameter('deg_TNFRtnf', 0.023)
@@ -494,9 +477,17 @@ Parameter('C1itnf_r_C1atnf', 2.0)
 # C1_off[state = i] : tnf <> C1 : tnf
 
 Rule('deg_tnf', TNF(c = None, tnfr = None) >> None, tnf_deg)
+
+
 Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
+# Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM()  >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
+
+
+
 Rule('tnf_TNFR_TNFRtnf', TNFR(tnf = None) + TNF(c = None, tnfr = None)  <> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_TNFR_f_TNFRtnf, tnf_TNFR_r_TNFRtnf)
+
 Rule('TNFRtnf_deg', TNFR(tnf = 1)%TNF(c =None, tnfr = 1) >> None, deg_TNFRtnf)
+
 Rule ('TNFRtnf_TTR_C1itnf', TNFR(tnf = 1) % TNF(c = None, tnfr = 1) + TTR() <> C1(tnf = 1, state = 'i') % TNF(c = 1, tnfr =None), TNFRtnf_TTR_f_C1itnf, TNFRtnf_TTR_r_C1itnf)
 Rule('C1itnf_C1atnf', C1(tnf = 1, state = 'i') % TNF(c = 1, tnfr = None) <> C1(tnf = 1, state = 'a') % TNF(c = 1, tnfr = None), C1itnf_f_C1atnf, C1itnf_r_C1atnf)
 
@@ -611,14 +602,393 @@ species_dict = {
 
 Observable('TNF_obs', TNF(c = None, tnfr = None))
 Observable('IKKK_obs', IKKK(state = 'a'))
-Observable('IkBd_obs', IkBd(nfkb=None, S='C'))
+Observable('IKKKoff_obs', IKKK(state = 'i'))
+# Observable('IkBd_obs', IkBd(nfkb=None, S='C'))
 Observable('IKK_obs', IKK(state = 'a'))
 Observable('NFkBn_obs', NFkB(ikb=None, S='N'))
-Observable('a20t_obs', A20t())
-Observable('a20_obs', A20())
+Observable('NFkB_obs', NFkB(ikb=None, S='C'))
+Observable('A20t_obs', A20t())
+Observable('A20_obs', A20())
+Observable('TNFRM_obs', TNFRM())
+Observable('TNFRTNF_obs', TNF(c = None, tnfr = 1)%TNFR(tnf = 1))
+Observable('TNFR_obs', TNFR(tnf = None))
+Observable('TTR_obs', TTR())
+Observable('C1_obs', C1(tnf = None, state = 'a'))
+Observable('C1off_obs', C1(tnf = None, state = 'i'))
+Observable('C1tnf_obs', C1(tnf = 1, state = 'a')%TNF(c = 1, tnfr = None))
+Observable('C1tnfoff_obs', C1(tnf = 1, state = 'i')%TNF(c = 1, tnfr = None))
+
+
+
+Observable('IKKa_obs', IKK(state = 'a'))
+Observable('IKKi_obs', IKK(state = 'i'))
+Observable('IKKai_obs', IKK(state = 'ai'))
+Observable('IKKKa_obs', IKKK(state = 'a'))
+#RNA synthesis by NFkBn and Hill Coefficient
+
+# Observable('IkBa_mRNA_obs', IkBa_mRNA())
+# Observable('IkBa_obs', IkBa(b=ANY, c=ANY, S=ANY))
+#Observables for NFkB
+# def observables():
+
+# Observable('IKK2_obs', IKK2(ikb = None, S='C'))
+
+# Observable('NFkBn_obs', NFkB(ikb=WILD, S='N'))
+Observable('NFkBn_bound', NFkB(ikb=ANY, S='N'))
+
+Observable('IkBa_mRNA_obs', IkBa_mRNA())
+Observable('IkBb_mRNA_obs', IkBb_mRNA())
+Observable('IkBe_mRNA_obs', IkBe_mRNA())
+Observable('IkBd_mRNA_obs', IkBd_mRNA())
+
+# Observable('TNF_obs', TNF(c = None, tnfr = None))
+# Observable('A20_obs', A20())
+
+Observable('IkBa_obs', IkBa(nfkb = None, S='C'))
+Observable('IkBan_obs', IkBa(nfkb = None, S='N'))
+Observable('IkBaNFkB_obs', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+Observable('IkBaNFkBn_obs', IkBa(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+
+Observable('IkBb_obs', IkBb(nfkb = None, S='C'))
+Observable('IkBbn_obs', IkBb(nfkb = None, S='N'))
+Observable('IkBbNFkB_obs', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+Observable('IkBbNFkBn_obs', IkBb(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+
+Observable('IkBe_obs', IkBe(nfkb = None, S='C'))
+Observable('IkBen_obs', IkBe(nfkb = None, S='N'))
+Observable('IkBeNFkB_obs', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+Observable('IkBeNFkBn_obs', IkBe(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+
+
+Observable('IkBd_obs', IkBd(nfkb = None, S='C'))
+Observable('IkBdn_obs', IkBd(nfkb = None, S='N'))
+Observable('IkBdNFkB_obs', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
 tspan = np.linspace(0, 720, 721)
 x = odesolve(model,tspan,verbose=True)
+print("Initial Conditions")
+y = model.initial_conditions
+print(np.transpose(y))
+#
+print('TTR conc')
+print(x['TTR_obs'])
+
+# plt.figure()
+# plt.plot(tspan/60, x['IkBa_mRNA_obs'], label = 'IkBa_mRNA_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBa_obs'], label = 'IkBa_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBaNFkB_obs'], label = 'IkBaNFkB_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBaNFkBn_obs'], label = 'IkBaNFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBan_obs'], label = 'IkBan_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60, x['IkBb_mRNA_obs'], label = 'IkBb_mRNA_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBb_obs'], label = 'IkBb_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBbNFkB_obs'], label = 'IkBbNFkB_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBbNFkBn_obs'], label = 'IkBbNFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBbn_obs'], label = 'IkBbn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60, x['IkBe_mRNA_obs'], label = 'IkBe_mRNA_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBe_obs'], label = 'IkBe_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBeNFkB_obs'], label = 'IkBeNFkB_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBeNFkBn_obs'], label = 'IkBeNFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBen_obs'], label = 'IkBen_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60, x['IkBd_mRNA_obs'], label = 'IkBd_mRNA_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBd_obs'], label = 'IkBd_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBdNFkB_obs'], label = 'IkBdNFkB_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBdNFkBn_obs'], label = 'IkBdNFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IkBdn_obs'], label = 'IkBdn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+
+# plt.figure()
+# plt.plot(tspan/60, x['NFkB_obs'], label = 'NFkB_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+
+# plt.figure()
+# plt.plot(tspan/60, x['NFkBn_obs'], label = 'NFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # # plt.show()
+# #
+# # plt.figure()
+# # plt.plot(tspan/60, x['IKKKoff_obs'], label = 'IKKKoff_obs')
+# # plt.xlabel("Time (in hours)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
+# # # plt.show()
+# #
+# plt.figure()
+# plt.plot(tspan/60, x['IKKK_obs'], label = 'IKKK_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # # plt.show()
+# #
+# # plt.figure()
+# # plt.plot(tspan/60, x['IKKi_obs'], label = 'IKKi_obs')
+# # plt.xlabel("Time (in hours)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
+# #
+# plt.figure()
+# plt.plot(tspan/60, x['IKKa_obs'], label = 'IKKa_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['IKKai_obs'], label = 'IKKai_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['TNF_obs'], label = 'TNF_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+plt.figure()
+plt.plot(tspan/60, x['TNFRM_obs'], label = 'TNFRM_obs')
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+# plt.show()
+
+plt.figure()
+plt.plot(tspan/60, x['TNFR_obs'], label = 'TNFR_obs')
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60, x['A20t_obs'], label = 'A20t_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['A20_obs'], label = 'A20_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# plt.show()
+#
+plt.figure()
+plt.plot(tspan/60, x['TTR_obs'], label = 'TTR_obs')
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['TNFRM_obs'], label = 'TNFRM_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# # plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['TNFR_obs'], label = 'TNFR_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60, x['TNFRTNF_obs'], label = 'TNFRTNF_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+# plt.figure()
+# plt.plot(tspan/60, x['C1_obs'], label = 'C1_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+# plt.figure()
+# plt.plot(tspan/60, x['C1off_obs'], label = 'C1off_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+# plt.figure()
+# plt.plot(tspan/60, x['C1tnf_obs'], label = 'C1tnf_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+# plt.figure()
+# plt.plot(tspan/60, x['C1tnfoff_obs'], label = 'C1tnfoff_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+
+
+
+# plt.show()
+
+
+
 # for obs in ["TNF_obs", "IKKK_obs","IkBd_obs", "IKK_obs","NFkBn_obs", "a20t_obs","a20_obs"]:
 # plt.figure(1)
 # # plt.plot(time/60, x[obs], label=re.match(r"(\w+)_obs", obs).group(), linewidth=3)
@@ -687,10 +1057,10 @@ x = odesolve(model,tspan,verbose=True)
 # x = odesolve(model,tspan,verbose=True)
 
 
-for  j,ode in enumerate(model.odes):
-    for i in range(len(model.species)):
-       ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
-    print j,":",ode
+# for  j,ode in enumerate(model.odes):
+#     for i in range(len(model.species)):
+#        ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
+#     print j,":",ode
 # #
 # # # for i,ode in enumerate(model.odes):
 # # #     print i,":", ode
@@ -735,38 +1105,38 @@ for  j,ode in enumerate(model.odes):
 # plt.ylabel("Concentration", fontsize=16)
 # # plt.ylim(ymin = -10, ymax =100)
 # plt.legend(loc=0)
-# plt.show()
+# # plt.show()
 #
-# plt.figure(1)
-# plt.plot(tspan/60, x['NFkBc_free'], label = NFkBc_free.name)
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
-# plt.show()
-
-
-# plt.figure(1)
-# plt.plot(tspan/60, x['NFkBn_free'], label = NFkBn_free.name)
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
+# # plt.figure(1)
+# # plt.plot(tspan/60, x['NFkBc_free'], label = NFkBc_free.name)
+# # plt.xlabel("Time (in hours)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
+# # # plt.show()
+# #
+# #
+# # plt.figure(1)
+# # plt.plot(tspan/60, x['NFkBn_free'], label = NFkBn_free.name)
+# # plt.xlabel("Time (in hours)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
+# #
+# # plt.figure(1)
+# # plt.plot(tspan/60, x['NFkBn_free'], label = NFkBn_free.name)
+# # plt.xlabel("Time (in hours)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
+# #
+# # plt.figure(1)
+# # plt.plot(tspan/60, x['NFkBn_bound'], label = NFkBn_bound.name)
+# # plt.xlabel("Time (in hours)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
 #
-# plt.figure(1)
-# plt.plot(tspan/60, x['NFkBn_free'], label = NFkBn_free.name)
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
-#
-# plt.figure(1)
-# plt.plot(tspan/60, x['NFkBn_bound'], label = NFkBn_bound.name)
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
-
 # plt.figure()
 # plt.plot(tspan/60, x['IKK_obs'], label = IKK.name)
 # plt.xlabel("Time (in hours)", fontsize=16)
@@ -780,6 +1150,7 @@ for  j,ode in enumerate(model.odes):
 # plt.ylabel("Concentration", fontsize=16)
 # # plt.ylim(ymin = -10, ymax =100)
 # plt.legend(loc=0)
+# plt.show()
 # #
 # # ikk2_vals = []
 # nsims = len(tspan) - 1 #simulation time is 720

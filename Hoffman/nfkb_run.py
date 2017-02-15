@@ -16,8 +16,8 @@ print('hello1')
 nfkb_modules.nfkb_and_ikk_monomers()
 print('hello2')
 # nfkb_modules.a20_mrna_to_a20()
-nfkb_modules.ligand_to_receptor_monomers()
-nfkb_modules.complex_monomers()
+# nfkb_modules.ligand_to_receptor_monomers()
+# nfkb_modules.complex_monomers()
 nfkb_modules.kinase_monomers()
 # nfkb_modules.initial_conditions()
 nfkb_modules.observables()
@@ -52,7 +52,7 @@ nfkb_modules.ikkk_to_ikk_complex()
 nfkb_modules.species_dict()
 
 #phase 2 of model using Solver
-tspan = np.linspace(0, 720, 721)
+tspan = np.linspace(0, 300, 301)
 x = odesolve(model,tspan,verbose=True)
 
 #updating the species names in the odes
