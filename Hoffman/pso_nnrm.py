@@ -21,7 +21,7 @@ else:
 # from exported_nnrm import model
 from calibration_nfkb import model
 from pysb.integrate import Solver
-from pysb.simulator.scipyode import ScipyOdeSimulator
+# from pysb.simulator.scipyode import ScipyOdeSimulator
 show = False
 # you can do this in pycharm by right clicking on folder and
 # do "Mark directory as" and do "Source"
