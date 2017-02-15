@@ -19,7 +19,7 @@ else:
     show = True
 
 # from exported_nnrm import model
-from old_hoffman_nfkb import model
+from calibration_nfkb import model
 from pysb.integrate import Solver
 from pysb.simulator.scipyode import ScipyOdeSimulator
 show = False
