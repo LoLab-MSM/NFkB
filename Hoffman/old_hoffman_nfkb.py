@@ -667,12 +667,12 @@ Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
 tspan = np.linspace(0, 720, 721)
 x = odesolve(model,tspan,verbose=True)
-print("Initial Conditions")
-y = model.initial_conditions
-print(np.transpose(y))
-#
-print('param len')
-print(len(model.parameters))
+# print("Initial Conditions")
+# y = model.initial_conditions
+# print(np.transpose(y))
+# #
+# print('param len')
+# print(len(model.parameters))
 
 # plt.figure()
 # plt.plot(tspan/60, x['IkBa_mRNA_obs'], label = 'IkBa_mRNA_obs')
