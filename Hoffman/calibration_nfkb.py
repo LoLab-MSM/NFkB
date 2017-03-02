@@ -684,41 +684,41 @@ Rule('IKKai_IKKi', IKK(state = 'ai') >> IKK(state = 'i'), IKKai_f_IKKi)
 #     39: 'SINK'
 # }
 
-Observable('TNF_obs', TNF(c = None, tnfr = None))
-Observable('IKKK_obs', IKKK(state = 'a'))
-Observable('IKKKoff_obs', IKKK(state = 'i'))
-# Observable('IkBd_obs', IkBd(nfkb=None, S='C'))
-Observable('IKK_obs', IKK(state = 'a'))
-Observable('NFkBn_obs', NFkB(ikb=None, S='N'))
-Observable('NFkB_obs', NFkB(ikb=None, S='C'))
-Observable('A20t_obs', A20t())
-Observable('A20_obs', A20())
-Observable('TNFRM_obs', TNFRM())
-Observable('TNFRTNF_obs', TNF(c = None, tnfr = 1)%TNFR(tnf = 1))
-Observable('TNFR_obs', TNFR(tnf = None))
-Observable('TTR_obs', TTR())
-Observable('C1_obs', C1(tnf = None, state = 'a'))
-Observable('C1off_obs', C1(tnf = None, state = 'i'))
-Observable('C1tnf_obs', C1(tnf = 1, state = 'a')%TNF(c = 1, tnfr = None))
-Observable('C1tnfoff_obs', C1(tnf = 1, state = 'i')%TNF(c = 1, tnfr = None))
-
-
-
-Observable('IKKa_obs', IKK(state = 'a'))
-Observable('IKKi_obs', IKK(state = 'i'))
-Observable('IKKai_obs', IKK(state = 'ai'))
-Observable('IKKKa_obs', IKKK(state = 'a'))
-#RNA synthesis by NFkBn and Hill Coefficient
-
-# Observable('IkBa_mRNA_obs', IkBa_mRNA())
-# Observable('IkBa_obs', IkBa(b=ANY, c=ANY, S=ANY))
-#Observables for NFkB
-# def observables():
-
-# Observable('IKK2_obs', IKK2(ikb = None, S='C'))
-
-# Observable('NFkBn_obs', NFkB(ikb=WILD, S='N'))
-Observable('NFkBn_bound', NFkB(ikb=ANY, S='N'))
+# Observable('TNF_obs', TNF(c = None, tnfr = None))
+# Observable('IKKK_obs', IKKK(state = 'a'))
+# Observable('IKKKoff_obs', IKKK(state = 'i'))
+# # Observable('IkBd_obs', IkBd(nfkb=None, S='C'))
+# Observable('IKK_obs', IKK(state = 'a'))
+# Observable('NFkBn_obs', NFkB(ikb=None, S='N'))
+# Observable('NFkB_obs', NFkB(ikb=None, S='C'))
+# Observable('A20t_obs', A20t())
+# Observable('A20_obs', A20())
+# Observable('TNFRM_obs', TNFRM())
+# Observable('TNFRTNF_obs', TNF(c = None, tnfr = 1)%TNFR(tnf = 1))
+# Observable('TNFR_obs', TNFR(tnf = None))
+# Observable('TTR_obs', TTR())
+# Observable('C1_obs', C1(tnf = None, state = 'a'))
+# Observable('C1off_obs', C1(tnf = None, state = 'i'))
+# Observable('C1tnf_obs', C1(tnf = 1, state = 'a')%TNF(c = 1, tnfr = None))
+# Observable('C1tnfoff_obs', C1(tnf = 1, state = 'i')%TNF(c = 1, tnfr = None))
+#
+#
+#
+# Observable('IKKa_obs', IKK(state = 'a'))
+# Observable('IKKi_obs', IKK(state = 'i'))
+# Observable('IKKai_obs', IKK(state = 'ai'))
+# Observable('IKKKa_obs', IKKK(state = 'a'))
+# #RNA synthesis by NFkBn and Hill Coefficient
+#
+# # Observable('IkBa_mRNA_obs', IkBa_mRNA())
+# # Observable('IkBa_obs', IkBa(b=ANY, c=ANY, S=ANY))
+# #Observables for NFkB
+# # def observables():
+#
+# # Observable('IKK2_obs', IKK2(ikb = None, S='C'))
+#
+# # Observable('NFkBn_obs', NFkB(ikb=WILD, S='N'))
+# Observable('NFkBn_bound', NFkB(ikb=ANY, S='N'))
 
 Observable('IkBa_mRNA_obs', IkBa_mRNA())
 Observable('IkBb_mRNA_obs', IkBb_mRNA())
@@ -729,42 +729,42 @@ Observable('IkBd_mRNA_obs', IkBd_mRNA())
 # Observable('A20_obs', A20())
 
 Observable('IkBa_obs', IkBa(nfkb = None, S='C'))
-Observable('IkBan_obs', IkBa(nfkb = None, S='N'))
-Observable('IkBaNFkB_obs', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
-Observable('IkBaNFkBn_obs', IkBa(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+# Observable('IkBan_obs', IkBa(nfkb = None, S='N'))
+# Observable('IkBaNFkB_obs', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+# Observable('IkBaNFkBn_obs', IkBa(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
 Observable('IkBb_obs', IkBb(nfkb = None, S='C'))
-Observable('IkBbn_obs', IkBb(nfkb = None, S='N'))
-Observable('IkBbNFkB_obs', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
-Observable('IkBbNFkBn_obs', IkBb(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+# Observable('IkBbn_obs', IkBb(nfkb = None, S='N'))
+# Observable('IkBbNFkB_obs', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+# Observable('IkBbNFkBn_obs', IkBb(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
 Observable('IkBe_obs', IkBe(nfkb = None, S='C'))
-Observable('IkBen_obs', IkBe(nfkb = None, S='N'))
-Observable('IkBeNFkB_obs', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
-Observable('IkBeNFkBn_obs', IkBe(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+# Observable('IkBen_obs', IkBe(nfkb = None, S='N'))
+# Observable('IkBeNFkB_obs', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+# Observable('IkBeNFkBn_obs', IkBe(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
 
 Observable('IkBd_obs', IkBd(nfkb = None, S='C'))
-Observable('IkBdn_obs', IkBd(nfkb = None, S='N'))
-Observable('IkBdNFkB_obs', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
-Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
+# Observable('IkBdn_obs', IkBd(nfkb = None, S='N'))
+# Observable('IkBdNFkB_obs', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
+# Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
-tspan = np.linspace(0, 720, 721)
-x = odesolve(model,tspan,verbose=True)
+# tspan = np.linspace(0, 720, 721)
+# x = odesolve(model,tspan,verbose=True)
 # print("Initial Conditions")
 # y = model.initial_conditions
 # print(np.transpose(y))
 # #
 # print('TTR conc')
 # print(x['TTR_obs'])
-
-plt.figure()
-plt.plot(tspan/60, x['NFkBn_obs'], label = 'NFkBn_obs')
-plt.xlabel("Time (in hours)", fontsize=16)
-plt.ylabel("Concentration", fontsize=16)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-plt.show()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['NFkBn_obs'], label = 'NFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# plt.show()
 #
 # plt.figure()
 # plt.plot(tspan/60, x['IkBa_obs'], label = 'IkBa_obs')
