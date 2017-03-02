@@ -1,4 +1,4 @@
-__author__ = 'geena'
+# __author__ = 'geena'
 
 from pysb import *
 import pandas as pd
@@ -10,7 +10,44 @@ import numpy as np
 from scipy import interpolate
 from scipy.interpolate import *
 import scipy.interpolate
+from pysb.simulator import ScipyOdeSimulator
 import numpy as np
+
+
+def run_sim_with_perturbations(sim, tspan, perturbations):
+    perturbation_times = sorted(perturbations.keys())
+
+    for t in perturbation_times:
+        if not any(np.isclose(t, tspan)):
+            raise ValueError('Perturbation time %f is not defined in tspan'
+                             % t)
+
+    # Create the tspans for each simulation stage
+    tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
+                              perturbation_times])
+    for i in range(len(tspans) - 1):
+        tspans[i] = np.append(tspans[i], tspans[i + 1][0])
+
+    # Do an initial simulation with the above setup until the point at which
+    # we want to change a parameter (perturbation_time)
+    res = sim.run(tspan=tspans[0])
+
+    df_out = res.dataframe
+
+    for i, t in enumerate(perturbation_times, 1):
+        res = sim.run(initials=res.species[-1],
+                      param_values=perturbation_params[t],
+                      tspan=tspans[i])
+
+        df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
+
+    return df_out
+
+
+
+
+
+
 Model ()
 
 #Declaration of monomers
@@ -207,8 +244,6 @@ Initial(A20t(), a20t_0)
 # Initial(TNF(c = None, tnfr = None), TNF_0)
 
 
-
-
 # def  ikb_mrna_to_ikb():
 Parameter('psynth_a', 7e-5)
 Parameter('psynth_b', 1e-5)
@@ -220,22 +255,74 @@ Rule('e_synth', None >> IkBe_mRNA(), psynth_e)
 Rule('d_synth', None >> IkBd_mRNA(), psynth_d)
 
 Parameter('hill', 3)
-Parameter('a', 8)
-Parameter('b', 0.02)
-Parameter('e', 0.3)
-Parameter('d', 0.025)
+# Parameter('a', 0)
+# Parameter('b', 0)
+# Parameter('e', 0)
+# Parameter('d', 0)
+# Parameter('a', 8)
+# Parameter('b', 0.02)
+# Parameter('e', 0.3)
+# Parameter('d', 0.025)
 
 Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 
-Expression('a_NFkBn', a*(NFkBn_free)**(hill))
-Expression('b_NFkBn', b*(NFkBn_free)**(hill))
-Expression('e_NFkBn', e*(NFkBn_free)**(hill))
-Expression('d_NFkBn', d*(NFkBn_free)**(hill))
+# Parameter('zero', 0)
+# Parameter('a_NFkBn', 0)
+# Parameter('b_NFkBn', 0)
+# Parameter('e_NFkBn', 0)
+# Parameter('d_NFkBn', 0)
+
+Parameter('a', 0)
+Parameter('b', 0)
+Parameter('e', 0)
+Parameter('d', 0)
+Expression('a_NFkBn', a*model.observables['NFkBn_free']**(hill))
+Expression('b_NFkBn', b*model.observables['NFkBn_free']**(hill))
+Expression('e_NFkBn', e*model.observables['NFkBn_free']**(hill))
+Expression('d_NFkBn', d*model.observables['NFkBn_free']**(hill))
 
 Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
 Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
 Rule('en_mRNA', None >> IkBe_mRNA(), e_NFkBn)
 Rule('dn_mRNA', None >> IkBd_mRNA(), d_NFkBn)
+
+#A20 mRNA and Protein Synthesis and Degradation Reactions
+# def a20_mrna_to_a20():
+Parameter('A20_mRNA', 2e-6)
+Parameter('A20n', 0.4)
+Parameter('A20_mRNA_c_deg', 0.035)
+Parameter('a1d_c_deg', 0.36)
+Parameter('A20_synth', 0.25)
+Parameter('A20_deg', 0.0029)
+
+Observable('obs_A20t', A20t())
+
+Expression('A20t_NFkBn', A20n*(NFkBn_free)**(hill))
+Expression('A20_synthesis', A20_synth*model.observables['obs_A20t'])
+
+Rule('A20t_synth', None >> A20t(), A20_mRNA)
+Rule('A20t_mediated_nfkbn', None >> A20t(), A20t_NFkBn)
+Rule('A20t_deg', A20t() >> None, A20_mRNA_c_deg)
+
+Rule('synth_A20', None >> A20(), A20_synthesis)
+Rule('deg_A20', A20() >> None, A20_deg)
+
+perturbation_params = {
+    10: {'a': 8},
+    37: {'b': .02, 'e': .3},
+    90: {'d': .025}
+}
+
+
+Parameter('nfkb_synthb', 0)
+Parameter('nfkb_synthe', 0)
+Parameter('nfkb_synthd', 0)
+
+# perturbation_params = {
+#     10: {'a_NFkBn': 8*model.observables['NFkBn_free']**3},
+#     37: {'b_NFkBn': .02*model.observables['NFkBn_free']**3, 'e_NFkBn': .3*model.observables['NFkBn_free']**3},
+#     90: {'d_NFkBn': .025*model.observables['NFkBn_free']**3}
+# }
 
 # IkB mRNA and protein synthesis reactions
 
@@ -385,33 +472,14 @@ Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), 
 Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), end_c_n)
 Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
 
-#A20 mRNA and Protein Synthesis and Degradation Reactions
-# def a20_mrna_to_a20():
-Parameter('A20_mRNA', 2e-6)
-Parameter('A20n', 0.4)
-Parameter('A20_mRNA_c_deg', 0.035)
-Parameter('a1d_c_deg', 0.36)
-Parameter('A20_synth', 0.25)
-Parameter('A20_deg', 0.0029)
 
-Observable('obs_A20t', A20t())
-
-Expression('A20t_NFkBn', A20n*(NFkBn_free)**(hill))
-Expression('A20_synthesis', A20_synth*obs_A20t)
-
-Rule('A20t_synth', None >> A20t(), A20_mRNA)
-Rule('A20t_mediated_nfkbn', None >> A20t(), A20t_NFkBn)
-Rule('A20t_deg', A20t() >> None, A20_mRNA_c_deg)
-
-Rule('synth_A20', None >> A20(), A20_synthesis)
-Rule('deg_A20', A20() >> None, A20_deg)
 
 #IKK Activation Module
 #TNF-Independent Complex 1 Activity Reactions
 # def tnf_independent_to_c1():
 Parameter('synth_tnfrm', 2e-7)
 Parameter('deg_tnfrm', 0.0058)
-Parameter('tnfr_f_tnfrm', 6*1e-5) # times 2
+Parameter('tnfr_f_tnfrm', 1e-5/6) # times 6
 Parameter('tnfr_r_tnfrm', 0.1)
 Parameter('deg_TNFR', 0.023)
 Parameter('TNFR_TTR_f_C1', 100.0)
@@ -422,7 +490,9 @@ Parameter('C1_f_A20', 1000.0)
 Parameter('C1_f_TNFR_TTR', 0.1)
 Parameter('C1_i_deg', 0.023)
 Parameter('C1_a_deg', 0.023)
+Observable('TNFRM_obs', TNFRM())
 
+# Expression('tnfrm_rule', tnfr_f_tnfrm/(TNFRM_obs)**2)
 # None >> tnfrm
 # tnfrm >> None
 # 3*tnfrm <> tnfr
@@ -432,12 +502,26 @@ Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
 Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
 # Rule('TNFR_3tnfrm', TNFRM() + TNFRM() + TNFRM() <> TNFR(tnf = None), tnfr_f_tnfrm, tnfr_r_tnfrm)
 
+# Parameter('tnfrm_none', 3*1e-05)
+# Parameter('none_tnfr', 1e-05)
+# Parameter('none_tnfrm', 3*.1)
+# Parameter('tnfr_none', .1)
+# Parameter('tnfrm_tnf_none', 3*1100)
+# Parameter('tnf_tnf_none', 1100)
+# Parameter('none_tnfrtnf', 1100)
+# Rule('one', TNFRM() >> None, tnfrm_none)
+# Rule('two', None >> TNFR(tnf = None), none_tnfr)
+# Rule('three', None >> TNFRM(), none_tnfrm)
+# Rule('four', TNFR(tnf = None) >> None, tnfr_none)
+# Rule('five', TNFRM() >> None, tnfrm_tnf_none)
+# Rule('six', TNF(c = None, tnfr = None) >> None, tnf_tnf_none)
+# Rule('seven', None >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), none_tnfrtnf)
 
-Rule('tnfrm3_to_TNFR', TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = None), tnfr_f_tnfrm)
-Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() + TNFRM() + TNFRM(), tnfr_r_tnfrm)
+# Rule('tnfrm3_to_TNFR', TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = None), tnfrm_rule)
+# Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() + TNFRM() + TNFRM(), tnfr_r_tnfrm)
 
-# Rule('tnfrm3_to_TNFR', TNFRM()  >> TNFR(tnf = None), tnfr_f_tnfrm)
-# Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() , tnfr_r_tnfrm)
+Rule('tnfrm3_to_TNFR', TNFRM()  >> TNFR(tnf = None), tnfr_f_tnfrm)
+Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() , tnfr_r_tnfrm)
 
 
 
@@ -460,7 +544,7 @@ Rule('C1a_deg', C1(tnf = None, state = 'a') >> None, C1_a_deg)
 #TNF-Dependent Complex 1 Activity Reactions
 # def tnf_dependent_to_c1():
 Parameter('tnf_deg', 0.0154)
-Parameter('tnf_tnfrm_f_TNFRtnf', 6*1100.0) # times 2
+Parameter('tnf_tnfrm_f_TNFRtnf', 1100.0/3) # times 2
 Parameter('tnf_TNFR_f_TNFRtnf', 1100.0)
 Parameter('tnf_TNFR_r_TNFRtnf', 0.021)
 Parameter('deg_TNFRtnf', 0.023)
@@ -478,9 +562,9 @@ Parameter('C1itnf_r_C1atnf', 2.0)
 
 Rule('deg_tnf', TNF(c = None, tnfr = None) >> None, tnf_deg)
 
-
-Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
-# Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM()  >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
+# Expression('tnfrmtnf_rule', tnf_tnfrm_f_TNFRtnf/(TNFRM_obs)**2)
+# Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnfrmtnf_rule)
+Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM()  >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
 
 
 
@@ -665,8 +749,8 @@ Observable('IkBdn_obs', IkBd(nfkb = None, S='N'))
 Observable('IkBdNFkB_obs', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
 Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
-# tspan = np.linspace(0, 720, 721)
-# x = odesolve(model,tspan,verbose=True)
+tspan = np.linspace(0, 720, 721)
+x = odesolve(model,tspan,verbose=True)
 # print("Initial Conditions")
 # y = model.initial_conditions
 # print(np.transpose(y))
@@ -674,13 +758,13 @@ Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 # print('TTR conc')
 # print(x['TTR_obs'])
 
-# plt.figure()
-# plt.plot(tspan/60, x['IkBa_mRNA_obs'], label = 'IkBa_mRNA_obs')
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
-# # plt.show()
+plt.figure()
+plt.plot(tspan/60, x['NFkBn_obs'], label = 'NFkBn_obs')
+plt.xlabel("Time (in hours)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+plt.show()
 #
 # plt.figure()
 # plt.plot(tspan/60, x['IkBa_obs'], label = 'IkBa_obs')

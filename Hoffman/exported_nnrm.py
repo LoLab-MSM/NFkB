@@ -143,14 +143,14 @@ Initial(IkBe_mRNA(), IkBet_0)
 Parameter('IkBdt_0', 3000) #IkBa .0001
 Initial(IkBd_mRNA(), IkBdt_0)
 
-Parameter('TNF_0', 698) #698 is 30ng/ml of TNF
+Parameter('TNF_0', 232) #698 is 30ng/ml of TNF
 Parameter('TNFR_0', 47000.0)
 Parameter('TRADD_0', 70000.0)
 Parameter('RIP1_0', 47000.0) #47000
 Parameter('TRAF_0', 47000.0)
-Parameter('cIAP_0', 10000.0) #10000
-Parameter('A20_0', 50000.0) #2256
-Parameter('CYLD_0', 50000.0) #50000
+# Parameter('cIAP_0', 10000.0) #10000
+# Parameter('A20_0', 50000.0) #2256
+# Parameter('CYLD_0', 50000.0) #50000
 Parameter('TAK1_0', 9000.0)
 Parameter('NEMO_0', 10000.0)
 Parameter('LUBAC_0', 10000.0)
@@ -166,11 +166,11 @@ Initial(TNFR(blig=None, brip=None, bDD = None), TNFR_0)
 Initial(TRADD(brec=None, brip=None, state='unmod', bDD1 = None, bDD2 = None), TRADD_0)
 Initial(RIP1(bscf=None, btraf=None, bub1=None, bub2=None, bub3=None, bDD = None, bRHIM = None, bMLKL = None, state='unmod'), RIP1_0)
 Initial(TRAF(brip=None, bciap=None, bcyld = None, state='unmod'), TRAF_0)
-Initial(cIAP(btraf=None), cIAP_0)
+# Initial(cIAP(btraf=None), cIAP_0)
 Initial(LUBAC(brip=None), LUBAC_0)
 
-Initial(A20(brip=None), A20_0)
-Initial(CYLD(brip=None, btraf = None), CYLD_0)
+# Initial(A20(brip=None), A20_0)
+# Initial(CYLD(brip=None, btraf = None), CYLD_0)
 
 
 
@@ -194,7 +194,7 @@ Initial(IkBd(ikk=None, nfkb=None, loc='C', state='active'), IkBd_0)
 # Parameter('NFkB_0', 50000.0)
 # Parameter('CYLD_0', 9000.0)
 Parameter('FADD_0', 8030.0)
-Parameter('flip_L_0', 39023.0)
+# Parameter('flip_L_0', 39023.0)
 # Parameter('flip_S_0', 39023.0)
 # Parameter('proC8_0', 16057.0)
 Parameter('C8_0', 10000) #10000
@@ -203,7 +203,7 @@ Parameter('RIP3_0', 20000.0) #20000
 Parameter('MLKLa_0', 50000.0) # 100000
 Initial(FADD(bDD=None, bDED1=None, bDED2=None), FADD_0)
 Initial(RIP3(bRHIM=None, bDD = None, state='unmod'), RIP3_0)
-Initial(flip_L(bDED=None), flip_L_0)
+# Initial(flip_L(bDED=None), flip_L_0)
 # Initial(flip_S(bDED=None), flip_S_0)
 # Initial(proC8(bDED=None), proC8_0)
 Initial(C8(bf=None, state='A'), C8_0)
@@ -299,7 +299,7 @@ Rule('C8_activation2', TRADD(brec = None, brip = 3, bDD1=None, bDD2=None) % RIP1
      >> RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = 5, state = 'deub')% RIP3(bRHIM=5, bDD = None, state='unmod'), kc_c8_2)
 
 
-Parameter('TNF_deg1', .01)
+Parameter('TNF_deg1', .1)
 Rule('TNF_deg', TNF(brec = None) >> None, TNF_deg1)
 
 Rule('bind_FADDANYANYflip_LANYproC8ANY_RIP1unmod', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = 5, state = 'deub')% RIP3(bRHIM=5, bDD = None, state='unmod')
@@ -848,86 +848,86 @@ Rule('en_c_n', IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C') >> NFkB(ikb=None, loc='C'), dnd_c_n)
 
 
-# Observable('one', TNF(brec=1) % TNFR(blig=1, brip=None))
-#
-# Observable('two', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = None, bDD1=None, bDD2=None))
-#
-# Observable('three', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None)
-#            % RIP1(bscf=3, btraf=None, bub1=None, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='unmod'))
-#
-# Observable('four', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) %
-#            RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='unmod') % TRAF(brip=4, bciap=None, state='unmod'))
-#
-# Observable('five', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) %
-#            RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='K63ub') % TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5))
-#
-# Observable('six', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) % RIP1(bscf=3, btraf=4, bub1=6, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='K63ub')
-#            % TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5) % LUBAC(brip = 6))
-#
+Observable('one', TNF(brec=1) % TNFR(blig=1, brip=None))
+
+Observable('two', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = None, bDD1=None, bDD2=None))
+
+Observable('three', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None)
+           % RIP1(bscf=3, btraf=None, bub1=None, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='unmod'))
+
+Observable('four', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) %
+           RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='unmod') % TRAF(brip=4, bciap=None, state='unmod'))
+
+Observable('five', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) %
+           RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='K63ub') % TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5))
+
+Observable('six', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) % RIP1(bscf=3, btraf=4, bub1=6, bub2=None, bub3=None,bDD = None,bRHIM=None,bMLKL=None, state='K63ub')
+           % TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5) % LUBAC(brip = 6))
+
+Observable('RIP1deub', RIP1(state='deub'))
+# Observable('TAK1',TAK1(brip = ANY))
+Observable('TAK1b', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) % RIP1(bscf=3, btraf=4, bub1=6, bub2=7, bub3=8,bDD = None,bRHIM=None,bMLKL=None, state='K63ub')
+           % TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5) % LUBAC(brip = 6) % NEMO(brip=7) % TAK1(brip=8))
+Observable('IKK_obs', IKK(bind=None, bnemo = None, state = 'A'))
+Observable('IKKb', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) % RIP1(bscf=3, btraf=4, bub1=6, bub2=7, bub3=8,bDD = 9,bRHIM=None,bMLKL=None, state='K63ub') %
+           TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5) % LUBAC(brip = 6) % NEMO(brip=7) % TAK1(brip=8) % IKK(bind=9, bnemo = None, state = 'I'))
+
+
+Observable('RIP1RIP3po4', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = 5, state = 'po4')
+           % RIP3(bRHIM=5, bDD = None, state='po4'))
+Observable('MLKLa', MLKL(bRHIM=None, state='active'))
+
+Observable('RIPMLKL', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = 1, bRHIM = 5, state = 'po4')
+           % RIP3(bRHIM=5, bDD = None, state='po4') % MLKL(bRHIM=1, state='unmod'))
+
+
+
+# Defining Observables
+Observable('TNFR_TNF', TNFR(blig=ANY))
+Observable('TRADD_CompI', TRADD(brec=ANY))
+Observable('RIP1_CompI', TNFR() % RIP1())
+Observable('RIP1ub', RIP1(state='K63ub'))
+# Observable('TRAF_CompI', TRAF(brip=ANY) % RIP1(btraf=ANY))
+# Observable('Obs_TRAF_ComplexI', TRAF(brip=ANY) % RIP1(btraf=ANY))
+Observable('Ubiquitylated_ComplexI', RIP1(state='K63ub'))
+Observable('MAPK_activity', MAPK(state='active'))
 # Observable('RIP1deub', RIP1(state='deub'))
-# # Observable('TAK1',TAK1(brip = ANY))
-# Observable('TAK1b', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) % RIP1(bscf=3, btraf=4, bub1=6, bub2=7, bub3=8,bDD = None,bRHIM=None,bMLKL=None, state='K63ub')
-#            % TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5) % LUBAC(brip = 6) % NEMO(brip=7) % TAK1(brip=8))
-# Observable('IKK_obs', IKK(bind=None, bnemo = None, state = 'A'))
-# Observable('IKKb', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec = 2, brip = 3, bDD1=None, bDD2=None) % RIP1(bscf=3, btraf=4, bub1=6, bub2=7, bub3=8,bDD = 9,bRHIM=None,bMLKL=None, state='K63ub') %
-#            TRAF(brip=4, bciap=5, bcyld =None, state='unmod') % cIAP(btraf = 5) % LUBAC(brip = 6) % NEMO(brip=7) % TAK1(brip=8) % IKK(bind=9, bnemo = None, state = 'I'))
-#
-#
-# Observable('RIP1RIP3po4', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = 5, state = 'po4')
-#            % RIP3(bRHIM=5, bDD = None, state='po4'))
-# Observable('MLKLa', MLKL(bRHIM=None, state='active'))
-#
-# Observable('RIPMLKL', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = 1, bRHIM = 5, state = 'po4')
-#            % RIP3(bRHIM=5, bDD = None, state='po4') % MLKL(bRHIM=1, state='unmod'))
-#
-#
-#
-# # Defining Observables
-# Observable('TNFR_TNF', TNFR(blig=ANY))
-# Observable('TRADD_CompI', TRADD(brec=ANY))
-# Observable('RIP1_CompI', TNFR() % RIP1())
-# Observable('RIP1ub', RIP1(state='K63ub'))
-# # Observable('TRAF_CompI', TRAF(brip=ANY) % RIP1(btraf=ANY))
-# # Observable('Obs_TRAF_ComplexI', TRAF(brip=ANY) % RIP1(btraf=ANY))
-# Observable('Ubiquitylated_ComplexI', RIP1(state='K63ub'))
-# Observable('MAPK_activity', MAPK(state='active'))
-# # Observable('RIP1deub', RIP1(state='deub'))
-# Observable('Obs_ComplexII', TRADD(brec=None, brip=1) % RIP1(bscf=1, btraf=None, bub1=None, bub2=None, bub3=None, state='deub'))
-# Observable('TNFR_endocytosis', TNF(brec=3) % TNFR(blig=3) % RIP1(btraf=None, bub1=None, bub2=None, bub3=None, state='deub'))
-# Observable('CYLD_CompI_1', RIP1(bscf=ANY, bub2=2, bub3=None, state='K63ub') % CYLD(brip=2))
-# Observable('CYLD_CompI_2', RIP1(bscf=ANY, btraf=3, bub2=2, bub3=None, state='K63ub') % CYLD(brip=2) % TRAF(brip=3, state='K63ub'))
-# Observable('NFkBn_obs', NFkB(loc='N'))
-# Observable('NFkB_obs', NFkB(loc='C'))
-# Observable('IkBa_obs', IkBa(loc='C', state='active'))
-# Observable('IkBb_obs', IkBb(loc='C', state='active'))
-# Observable('IkBe_obs', IkBe(loc='C', state='active'))
-# Observable('IkBd_obs', IkBd(loc='C', state='active'))
-# Observable('IkBan_obs', IkBa(ikk=None, nfkb=None, loc='N', state='active'))
-# Observable('IkBbn_obs', IkBb(ikk=None, nfkb=None, loc='N', state='active'))
-# Observable('IkBen_obs', IkBe(ikk=None, nfkb=None, loc='N', state='active'))
-# Observable('IkBdn_obs', IkBd(ikk=None, nfkb=None, loc='N', state='active'))
-# Observable('IkBaNFkB_obs', IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
-# Observable('IkBbNFkB_obs', IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
-# Observable('IkBeNFkB_obs', IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
-# Observable('IkBdNFkB_obs', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
-# Observable('IkBaNFkBn_obs', IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
-# Observable('IkBbNFkBn_obs', IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
-# Observable('IkBeNFkBn_obs', IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
-# Observable('IkBdNFkBn_obs', IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
-# Observable('RIP1_obs',RIP1(bscf=None, btraf=None, bub1=None, bub2=None, bub3=None, state='unmod'))
-# Observable('RIP3_obs', RIP3(bRHIM=None, bDD = None, state='unmod'))
-# Observable('MLKL_obs', MLKL(bRHIM=None, state='unmod'))
-# Observable('MLKLa_obs', MLKL(bRHIM=None, state='active'))
-# Observable('RIP13_obs', RIP1(bDD=ANY, bRHIM=1, state='unmod') % RIP3(bRHIM=1, bDD = None, state='unmod'))
-# Observable('RIP13po4_obs', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = 5, state = 'po4')% RIP3(bRHIM=5, bDD = None, state='po4'))
-# Observable('TNF_obs', TNF(brec = ANY))
-# Observable('RIPk63_obs',  RIP1(bscf=None, bub1=None, state='K63ub'))
-# Observable('TNFR_TRADD', TNFR(blig=None, brip=1) % TRADD(brec=1, brip=None))
-# Observable('CI_k63_obs', TRADD(brec=None, brip=1, state='K63ub') % RIP1(bscf=1, btraf=2, state='K63ub') % TRAF(brip=2, bciap=3, state='K63ub') % cIAP(btraf=3))
-# Observable('IkBamrna', IkBa_mRNA())
-# # Observable('IKK_obs', IKK(bind=None))
-# # Observable('IKKany', IKK(bind = ANY))
-# Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None, state='K63ub') % TRAF(brip=4, bciap=5, state='unmod') % cIAP(btraf = 5))
+Observable('Obs_ComplexII', TRADD(brec=None, brip=1) % RIP1(bscf=1, btraf=None, bub1=None, bub2=None, bub3=None, state='deub'))
+Observable('TNFR_endocytosis', TNF(brec=3) % TNFR(blig=3) % RIP1(btraf=None, bub1=None, bub2=None, bub3=None, state='deub'))
+Observable('CYLD_CompI_1', RIP1(bscf=ANY, bub2=2, bub3=None, state='K63ub') % CYLD(brip=2))
+Observable('CYLD_CompI_2', RIP1(bscf=ANY, btraf=3, bub2=2, bub3=None, state='K63ub') % CYLD(brip=2) % TRAF(brip=3, state='K63ub'))
+Observable('NFkBn_obs', NFkB(loc='N'))
+Observable('NFkB_obs', NFkB(loc='C'))
+Observable('IkBa_obs', IkBa(loc='C', state='active'))
+Observable('IkBb_obs', IkBb(loc='C', state='active'))
+Observable('IkBe_obs', IkBe(loc='C', state='active'))
+Observable('IkBd_obs', IkBd(loc='C', state='active'))
+Observable('IkBan_obs', IkBa(ikk=None, nfkb=None, loc='N', state='active'))
+Observable('IkBbn_obs', IkBb(ikk=None, nfkb=None, loc='N', state='active'))
+Observable('IkBen_obs', IkBe(ikk=None, nfkb=None, loc='N', state='active'))
+Observable('IkBdn_obs', IkBd(ikk=None, nfkb=None, loc='N', state='active'))
+Observable('IkBaNFkB_obs', IkBa(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
+Observable('IkBbNFkB_obs', IkBb(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
+Observable('IkBeNFkB_obs', IkBe(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
+Observable('IkBdNFkB_obs', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc='C'))
+Observable('IkBaNFkBn_obs', IkBa(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
+Observable('IkBbNFkBn_obs', IkBb(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
+Observable('IkBeNFkBn_obs', IkBe(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
+Observable('IkBdNFkBn_obs', IkBd(ikk=None, nfkb=1, loc='N', state='active') % NFkB(ikb=1, loc='N'))
+Observable('RIP1_obs',RIP1(bscf=None, btraf=None, bub1=None, bub2=None, bub3=None, state='unmod'))
+Observable('RIP3_obs', RIP3(bRHIM=None, bDD = None, state='unmod'))
+Observable('MLKL_obs', MLKL(bRHIM=None, state='unmod'))
+Observable('MLKLa_obs', MLKL(bRHIM=None, state='active'))
+Observable('RIP13_obs', RIP1(bDD=ANY, bRHIM=1, state='unmod') % RIP3(bRHIM=1, bDD = None, state='unmod'))
+Observable('RIP13po4_obs', RIP1(bscf = None, bub1 = None, bub2 = None, bub3 = None, bDD=None, btraf=None, bMLKL = None, bRHIM = 5, state = 'po4')% RIP3(bRHIM=5, bDD = None, state='po4'))
+Observable('TNF_obs', TNF(brec = ANY))
+Observable('RIPk63_obs',  RIP1(bscf=None, bub1=None, state='K63ub'))
+Observable('TNFR_TRADD', TNFR(blig=None, brip=1) % TRADD(brec=1, brip=None))
+Observable('CI_k63_obs', TRADD(brec=None, brip=1, state='K63ub') % RIP1(bscf=1, btraf=2, state='K63ub') % TRAF(brip=2, bciap=3, state='K63ub') % cIAP(btraf=3))
+Observable('IkBamrna', IkBa_mRNA())
+# Observable('IKK_obs', IKK(bind=None))
+# Observable('IKKany', IKK(bind = ANY))
+Observable('CI', TNF(brec = 1) % TNFR(blig=1, brip=2) % TRADD(brec=2, brip=3) % RIP1(bscf=3, btraf=4, bub1=None, bub2=None, bub3=None, state='K63ub') % TRAF(brip=4, bciap=5, state='unmod') % cIAP(btraf = 5))
 #
 # generate_network(model)
 # generate_equations(model)
@@ -938,8 +938,8 @@ Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 #     print i,":", sp
 #
 #
-# tspan = np.linspace(0, 1440, 1441)
-# x = odesolve(model,tspan,verbose=True)
+tspan = np.linspace(0, 1440, 1441)
+x = odesolve(model,tspan,verbose=True)
 #
 # plt.figure()
 # plt.plot(tspan/60, x['RIP1deub'], label="RIP1deub")
@@ -948,16 +948,16 @@ Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 # plt.ylabel("Molecules per Cell", fontsize=16)
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
-# # plt.title('RIP13po4')
-# #
-# plt.figure()
-# plt.plot(tspan/60, x['IKK_obs'], label="IKK")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 0.00000008)
-# plt.legend(loc=0)
-# #
+# plt.title('RIP13po4')
+#
+plt.figure()
+plt.plot(tspan/60, x['IKK_obs'], label="IKK")
+# plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+plt.xlabel("Time (in hr)", fontsize=16)
+plt.ylabel("Molecules per Cell", fontsize=16)
+# plt.ylim(ymin = 0, ymax = 0.00000008)
+plt.legend(loc=0)
+#
 # plt.figure()
 # plt.plot(tspan/60, x['RIPMLKL'], label="RIPMLKL")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
@@ -973,14 +973,14 @@ Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 # plt.ylabel("Molecules per Cell", fontsize=16)
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
-#
-# plt.figure()
-# plt.plot(tspan/60, x['MLKLa'], label="MLKLa")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 0.00000008)
-# plt.legend(loc=0)
+
+plt.figure()
+plt.plot(tspan/60, x['MLKLa'], label="MLKLa")
+# plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+plt.xlabel("Time (in hr)", fontsize=16)
+plt.ylabel("Molecules per Cell", fontsize=16)
+# plt.ylim(ymin = 0, ymax = 0.00000008)
+plt.legend(loc=0)
 #
 # plt.show()
 # plt.figure()
@@ -1045,40 +1045,40 @@ Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # plt.legend(loc=0)
 # plt.title('CI')
-# # #
-# # # plt.figure()
-# # # plt.plot(tspan/60, x['CI_k63_obs'], label="CI_k63")
-# # # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# # # plt.xlabel("Time (in hr)", fontsize=16)
-# # # plt.ylabel("Molecules per Cell", fontsize=16)
-# # # # plt.ylim(ymin = 0, ymax = 0.00000008)
-# # # plt.legend(loc=0)
-# # # plt.title('CI_k63')
-# # #
-# # #
-# plt.figure()
-# plt.plot(tspan/60, x['TNF_obs'], label="TNF")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 0.00000008)
-# plt.legend(loc=0)
-# plt.title('TNF')
-# # # pdf.savefig()
-# # # plt.close()
 # #
 # # plt.figure()
-# # plt.plot(tspan/60, x['RIP1ub'], label="RIP1ub")
+# # plt.plot(tspan/60, x['CI_k63_obs'], label="CI_k63")
 # # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
 # # plt.xlabel("Time (in hr)", fontsize=16)
 # # plt.ylabel("Molecules per Cell", fontsize=16)
 # # # plt.ylim(ymin = 0, ymax = 0.00000008)
 # # plt.legend(loc=0)
-# # plt.title('RIP1')
-# # # pdf.savefig()
-# # # plt.close()
+# # plt.title('CI_k63')
 # #
 # #
+plt.figure()
+plt.plot(tspan/60, x['TNF_obs'], label="TNF")
+# plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+plt.xlabel("Time (in hr)", fontsize=16)
+plt.ylabel("Molecules per Cell", fontsize=16)
+# plt.ylim(ymin = 0, ymax = 0.00000008)
+plt.legend(loc=0)
+plt.title('TNF')
+# # pdf.savefig()
+# # plt.close()
+#
+# plt.figure()
+# plt.plot(tspan/60, x['RIP1ub'], label="RIP1ub")
+# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+# plt.xlabel("Time (in hr)", fontsize=16)
+# plt.ylabel("Molecules per Cell", fontsize=16)
+# # plt.ylim(ymin = 0, ymax = 0.00000008)
+# plt.legend(loc=0)
+# plt.title('RIP1')
+# # pdf.savefig()
+# # plt.close()
+#
+#
 # plt.figure()
 # plt.plot(tspan/60, x['RIP13po4_obs'], label="RIP13po4")
 # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
@@ -1090,23 +1090,23 @@ Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 # # # # pdf.savefig()
 # # # # plt.close()
 # # #
-# # plt.figure()
-# # plt.plot(tspan/60, x['NFkB_obs'], label="NFkB")
-# # # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# # plt.xlabel("Time (in hr)", fontsize=16)
-# # plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = 1000)
-# # plt.legend(loc=0)
-# # plt.title('NFkB')
-# #
-# plt.figure()
-# plt.plot(tspan/60, x['NFkBn_obs'], label="NFkBn")
-# # plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
-# plt.xlabel("Time (in hr)", fontsize=16)
-# plt.ylabel("Molecules per Cell", fontsize=16)
-# # plt.ylim(ymin = 0, ymax = .0002)
-# plt.legend(loc=0)
-# plt.title('NFkBn')
+plt.figure()
+plt.plot(tspan/60, x['NFkB_obs'], label="NFkB")
+# plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+plt.xlabel("Time (in hr)", fontsize=16)
+plt.ylabel("Molecules per Cell", fontsize=16)
+plt.ylim(ymin = 0, ymax = 1000)
+plt.legend(loc=0)
+plt.title('NFkB')
+#
+plt.figure()
+plt.plot(tspan/60, x['NFkBn_obs'], label="NFkBn")
+# plt.plot(tspan, pandas_df['NFkBn'][0:721], label = 'NFkBn')
+plt.xlabel("Time (in hr)", fontsize=16)
+plt.ylabel("Molecules per Cell", fontsize=16)
+# plt.ylim(ymin = 0, ymax = .0002)
+plt.legend(loc=0)
+plt.title('NFkBn')
 # # # pdf.savefig()
 # # # plt.close()
 # #
@@ -1173,4 +1173,4 @@ Rule('dn_c_n', IkBd(ikk=None, nfkb=1, loc='C', state='active') % NFkB(ikb=1, loc
 # # pdf.savefig()
 # # plt.close()
 #
-# plt.show()
+plt.show()
