@@ -14,34 +14,34 @@ from pysb.simulator import ScipyOdeSimulator
 import numpy as np
 
 
-def run_sim_with_perturbations(sim, tspan, perturbations):
-    perturbation_times = sorted(perturbations.keys())
-
-    for t in perturbation_times:
-        if not any(np.isclose(t, tspan)):
-            raise ValueError('Perturbation time %f is not defined in tspan'
-                             % t)
-
-    # Create the tspans for each simulation stage
-    tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
-                              perturbation_times])
-    for i in range(len(tspans) - 1):
-        tspans[i] = np.append(tspans[i], tspans[i + 1][0])
-
-    # Do an initial simulation with the above setup until the point at which
-    # we want to change a parameter (perturbation_time)
-    res = sim.run(tspan=tspans[0])
-
-    df_out = res.dataframe
-
-    for i, t in enumerate(perturbation_times, 1):
-        res = sim.run(initials=res.species[-1],
-                      param_values=perturbation_params[t],
-                      tspan=tspans[i])
-
-        df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
-
-    return df_out
+# def run_sim_with_perturbations(sim, tspan, perturbations):
+#     perturbation_times = sorted(perturbations.keys())
+#
+#     for t in perturbation_times:
+#         if not any(np.isclose(t, tspan)):
+#             raise ValueError('Perturbation time %f is not defined in tspan'
+#                              % t)
+#
+#     # Create the tspans for each simulation stage
+#     tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
+#                               perturbation_times])
+#     for i in range(len(tspans) - 1):
+#         tspans[i] = np.append(tspans[i], tspans[i + 1][0])
+#
+#     # Do an initial simulation with the above setup until the point at which
+#     # we want to change a parameter (perturbation_time)
+#     res = sim.run(tspan=tspans[0])
+#
+#     df_out = res.dataframe
+#
+#     for i, t in enumerate(perturbation_times, 1):
+#         res = sim.run(initials=res.species[-1],
+#                       param_values=perturbation_params[t],
+#                       tspan=tspans[i])
+#
+#         df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
+#
+#     return df_out
 
 
 
@@ -272,14 +272,18 @@ Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 # Parameter('e_NFkBn', 0)
 # Parameter('d_NFkBn', 0)
 
-Parameter('a', 0)
-Parameter('b', 0)
-Parameter('e', 0)
-Parameter('d', 0)
-Expression('a_NFkBn', a*model.observables['NFkBn_free']**(hill))
-Expression('b_NFkBn', b*model.observables['NFkBn_free']**(hill))
-Expression('e_NFkBn', e*model.observables['NFkBn_free']**(hill))
-Expression('d_NFkBn', d*model.observables['NFkBn_free']**(hill))
+Parameter('hill', 3)
+Parameter('a', 8)
+Parameter('b', 0.02)
+Parameter('e', 0.3)
+Parameter('d', 0.025)
+
+Observable('NFkBn_free', NFkB(ikb=None, S='N'))
+
+Expression('a_NFkBn', a*(NFkBn_free)**(hill))
+Expression('b_NFkBn', b*(NFkBn_free)**(hill))
+Expression('e_NFkBn', e*(NFkBn_free)**(hill))
+Expression('d_NFkBn', d*(NFkBn_free)**(hill))
 
 Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
 Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
