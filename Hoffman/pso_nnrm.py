@@ -185,7 +185,7 @@ if __name__ == '__main__':
     display_jp(position=xnominal)
     # quit()
 
-    out_dir = 'PSO_results'
+    out_dir = 'PSO_results_GEENA'
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
 
@@ -201,7 +201,7 @@ if __name__ == '__main__':
         print("Iteration = {} : best value = {}".format(i, pso_fn.best.fitness.values[0]))
         csv_out = os.path.join(out_dir, 'best_fit_{}.csv'.format(i))
         fig_out = os.path.join(out_dir, 'best_fit_{}'.format(i))
-        error_out = os.path.join(out_dir, 'error_{}.txt'.format(i))
-        np.savetxt(error_out, error)
+ #       error_out = os.path.join(out_dir, 'error_{}.txt'.format(i))
+#        np.savetxt(error_out, error)
         np.savetxt(csv_out, pso_fn.best)
         display_jp(pso_fn.best, fig_out)

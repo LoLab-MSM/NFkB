@@ -10,7 +10,7 @@ import numpy as np
 from scipy import interpolate
 from scipy.interpolate import *
 import scipy.interpolate
-from pysb.simulator import ScipyOdeSimulator
+#from pysb.simulator import ScipyOdeSimulator
 import numpy as np
 
 
@@ -254,7 +254,7 @@ Rule('b_synth', None >> IkBb_mRNA(), psynth_b)
 Rule('e_synth', None >> IkBe_mRNA(), psynth_e)
 Rule('d_synth', None >> IkBd_mRNA(), psynth_d)
 
-Parameter('hill', 3)
+#Parameter('hill', 3)
 # Parameter('a', 0)
 # Parameter('b', 0)
 # Parameter('e', 0)
@@ -264,7 +264,7 @@ Parameter('hill', 3)
 # Parameter('e', 0.3)
 # Parameter('d', 0.025)
 
-Observable('NFkBn_free', NFkB(ikb=None, S='N'))
+#Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 
 # Parameter('zero', 0)
 # Parameter('a_NFkBn', 0)
@@ -311,11 +311,11 @@ Rule('A20t_deg', A20t() >> None, A20_mRNA_c_deg)
 Rule('synth_A20', None >> A20(), A20_synthesis)
 Rule('deg_A20', A20() >> None, A20_deg)
 
-perturbation_params = {
-    10: {'a': 8},
-    37: {'b': .02, 'e': .3},
-    90: {'d': .025}
-}
+#perturbation_params = {
+ #   10: {'a': 8},
+  #  37: {'b': .02, 'e': .3},
+   # 90: {'d': .025}
+#
 
 
 Parameter('nfkb_synthb', 0)
