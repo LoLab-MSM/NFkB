@@ -14,7 +14,7 @@ import scipy.interpolate
 Model ()
 
 result = []
-with open('Old NFkB/_diswitch.txt','r') as inputFile:
+with open('/Users/geenaildefonso/Projects/NFkB/Misc/Old NFkB/_diswitch.txt','r') as inputFile:
     for line in inputFile:
         result.append(float(line))
 ikk2 = np.asarray(result)
