@@ -185,7 +185,7 @@ if __name__ == '__main__':
     display_jp(position=xnominal)
     # quit()
 
-    out_dir = 'PSO_results_GEENA'
+    out_dir = 'PSO_results_newest'
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
 
