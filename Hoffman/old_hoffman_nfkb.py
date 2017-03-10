@@ -45,12 +45,7 @@ def run_sim_with_perturbations(sim, tspan, perturbations):
 
 
 
-time = tuple(range(0, 721))
-# print(time)
-data = pd.read_csv('/Users/geenaildefonso/data_ikk.csv')
-IKK_flux = tuple(data.loc[:, "IKK_flux"])
-# print(IKK.shape)
-# print(IKK)
+
 
 
 
@@ -214,7 +209,7 @@ Parameter('IKKi_0', 0.0013) #TRADD-TRAF-RIP
 Initial(IKK(state = 'ai'), IKKi_0)
 
 
-Parameter('TNF_0', .00196) #TNF
+Parameter('TNF_0', .2) #TNF
 Initial(TNF(c = None, tnfr = None), TNF_0)
 
 Parameter('TNFRM_0', 0.0) #TRADD-TRAF-RIP
@@ -449,19 +444,29 @@ Rule('dn_n', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N') >> NFkB(ikb=None, S='N'), n_
 # def ikb_ikk_mediated_deg():
 Observable('IKKa_obs', IKK(state = 'a'))
 
-Parameter('a_f_deg', 0.36/.1)
-Parameter('b_f_deg', 0.12/.1)
-Parameter('e_f_deg', 0.18/.1)
-Parameter('d_f_deg', 0.18*.01)
+# Parameter('a_f_deg', 0.36/.1)
+# Parameter('b_f_deg', 0.12/.1)
+# Parameter('e_f_deg', 0.18/.1)
+# Parameter('d_f_deg', 0.18*.01)
+#
+# Parameter('and_c_n', 0.36)
+# Parameter('bnd_c_n', 0.12)
+# Parameter('end_c_n', 0.18)
+# Parameter('dnd_c_n', 0.18*.01)
+
+Parameter('a_f_deg', 0.36)
+Parameter('b_f_deg', 0.12)
+Parameter('e_f_deg', 0.18)
+Parameter('d_f_deg', 0.18)
 
 Parameter('and_c_n', 0.36)
 Parameter('bnd_c_n', 0.12)
 Parameter('end_c_n', 0.18)
-Parameter('dnd_c_n', 0.18*.01)
+Parameter('dnd_c_n', 0.18)
 
-Expression('IKK_ikba_flux', model.observables['IKKa_obs']*a_f_deg)
-Expression('IKK_ikbb_flux', model.observables['IKKa_obs']*b_f_deg)
-Expression('IKK_ikbe_flux', model.observables['IKKa_obs']*e_f_deg)
+# Expression('IKK_ikba_flux', model.observables['IKKa_obs']*a_f_deg)
+# Expression('IKK_ikbb_flux', model.observables['IKKa_obs']*b_f_deg)
+# Expression('IKK_ikbe_flux', model.observables['IKKa_obs']*e_f_deg)
 # for i in tuple(range(721)):
 #     perturbation_params = {
 #         i: {'a_f_deg': [w*.36 for w in IKK_flux]}
@@ -482,26 +487,26 @@ Expression('IKK_ikbe_flux', model.observables['IKKa_obs']*e_f_deg)
 # IkBe : NFkB >> NFkB
 # IkBd : NFkB >> NFkB
 
-Rule('a_c_deg', IkBa(nfkb=None, S='C') >> None, IKK_ikba_flux)
-Rule('b_c_deg', IkBb(nfkb=None, S='C') >> None, IKK_ikbb_flux)
-Rule('e_c_deg', IkBe(nfkb=None, S='C') >> None, IKK_ikbe_flux)
-Rule('d_c_deg', IkBd(nfkb=None, S='C') >> None, d_f_deg)
-
-Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), IKK_ikba_flux)
-Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), IKK_ikbb_flux)
-Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), IKK_ikbe_flux)
-Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
-
-
 # Rule('a_c_deg', IkBa(nfkb=None, S='C') >> None, IKK_ikba_flux)
-# Rule('b_c_deg', IkBb(nfkb=None, S='C') >> None, b_f_deg)
-# Rule('e_c_deg', IkBe(nfkb=None, S='C') >> None, e_f_deg)
+# Rule('b_c_deg', IkBb(nfkb=None, S='C') >> None, IKK_ikbb_flux)
+# Rule('e_c_deg', IkBe(nfkb=None, S='C') >> None, IKK_ikbe_flux)
 # Rule('d_c_deg', IkBd(nfkb=None, S='C') >> None, d_f_deg)
 #
-# Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), and_c_n)
-# Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), bnd_c_n)
-# Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), end_c_n)
+# Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), IKK_ikba_flux)
+# Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), IKK_ikbb_flux)
+# Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), IKK_ikbe_flux)
 # Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
+
+
+Rule('a_c_deg', IkBa(nfkb=None, S='C') >> None, a_f_deg)
+Rule('b_c_deg', IkBb(nfkb=None, S='C') >> None, b_f_deg)
+Rule('e_c_deg', IkBe(nfkb=None, S='C') >> None, e_f_deg)
+Rule('d_c_deg', IkBd(nfkb=None, S='C') >> None, d_f_deg)
+#
+Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), and_c_n)
+Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), bnd_c_n)
+Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), end_c_n)
+Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
 
 #
 # Rule('a_c_deg', IkBa(nfkb=None, S='C') + IKK(state = 'a') >> IKK(state = 'a'), a_f_deg)
@@ -521,7 +526,7 @@ Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), 
 # def tnf_independent_to_c1():
 Parameter('synth_tnfrm', 2e-7)
 Parameter('deg_tnfrm', 0.0058)
-Parameter('tnfr_f_tnfrm', 1e-5*3) # times 6
+Parameter('tnfr_f_tnfrm', 1e-5) # times 6
 Parameter('tnfr_r_tnfrm', 0.1)
 Parameter('deg_TNFR', 0.023)
 Parameter('TNFR_TTR_f_C1', 100.0)
@@ -532,7 +537,7 @@ Parameter('C1_f_A20', 1000.0)
 Parameter('C1_f_TNFR_TTR', 0.1)
 Parameter('C1_i_deg', 0.023)
 Parameter('C1_a_deg', 0.023)
-Observable('TNFRM_obs', TNFRM())
+
 
 # Expression('tnfrm_rule', tnfr_f_tnfrm/(TNFRM_obs)**2)
 # None >> tnfrm
@@ -540,8 +545,8 @@ Observable('TNFRM_obs', TNFRM())
 # 3*tnfrm <> tnfr
 # tnfr >> None
 
-Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
-Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
+# Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
+# Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
 # Rule('TNFR_3tnfrm', TNFRM() + TNFRM() + TNFRM() <> TNFR(tnf = None), tnfr_f_tnfrm, tnfr_r_tnfrm)
 
 # Parameter('tnfrm_none', 3*1e-05)
@@ -586,7 +591,7 @@ Rule('C1a_deg', C1(tnf = None, state = 'a') >> None, C1_a_deg)
 #TNF-Dependent Complex 1 Activity Reactions
 # def tnf_dependent_to_c1():
 Parameter('tnf_deg', 0.0154)
-Parameter('tnf_tnfrm_f_TNFRtnf', 1100.0*3) # times 2
+Parameter('tnf_tnfrm_f_TNFRtnf', 1100.0) # times 2
 Parameter('tnf_TNFR_f_TNFRtnf', 1100.0)
 Parameter('tnf_TNFR_r_TNFRtnf', 0.021)
 Parameter('deg_TNFRtnf', 0.023)
@@ -735,7 +740,7 @@ Observable('NFkBn_obs', NFkB(ikb=None, S='N'))
 Observable('NFkB_obs', NFkB(ikb=None, S='C'))
 Observable('A20t_obs', A20t())
 Observable('A20_obs', A20())
-# Observable('TNFRM_obs', TNFRM())
+Observable('TNFRM_obs', TNFRM())
 Observable('TNFRTNF_obs', TNF(c = None, tnfr = 1)%TNFR(tnf = 1))
 Observable('TNFR_obs', TNFR(tnf = None))
 Observable('TTR_obs', TTR())
@@ -799,6 +804,16 @@ tspan = np.linspace(0, 720, 721)
 sim = ScipyOdeSimulator(model, tspan = tspan)
 simulation_result = sim.run()
 
+
+
+for  j,ode in enumerate(model.odes):
+    for i in range(len(model.species)):
+       ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
+    print j,":",ode
+
+
+print(model.parameters)
+
 # df = run_sim_with_perturbations(sim, tspan, perturbation_params)
 # print(df.shape)
 # print(len(df['__s25']))
@@ -806,32 +821,32 @@ simulation_result = sim.run()
 
 
 plt.figure()
-plt.plot(tspan/60, simulation_result.observables['A20_obs'], label = 'A20_obs')
+plt.plot(tspan/60, simulation_result.observables['TNFRM_obs'], label = 'TNFRM_obs')
 plt.xlabel("Time (in hours)", fontsize=16)
 plt.ylabel("Concentration", fontsize=16)
 # plt.ylim(ymin = -10, ymax =100)
 plt.legend(loc=0)
 
 plt.figure()
-plt.plot(tspan/60, simulation_result.observables['IKKa_obs'], label = 'IKKa_obs')
+plt.plot(tspan/60, simulation_result.observables['TNFR_obs'], label = 'TNFR_obs')
 plt.xlabel("Time (in hours)", fontsize=16)
 plt.ylabel("Concentration", fontsize=16)
 # plt.ylim(ymin = -10, ymax =100)
 plt.legend(loc=0)
 
-plt.figure()
-plt.plot(tspan/60, simulation_result.observables['NFkBn_obs'], label = 'NFkBnobs')
-plt.xlabel("Time (in hours)", fontsize=16)
-plt.ylabel("Concentration", fontsize=16)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-
-plt.figure()
-plt.plot(tspan/60, simulation_result.observables['IkBa_obs'], label = 'IkBa_obs')
-plt.xlabel("Time (in hours)", fontsize=16)
-plt.ylabel("Concentration", fontsize=16)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
+# plt.figure()
+# plt.plot(tspan/60, simulation_result.observables['NFkBn_obs'], label = 'NFkBnobs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+# plt.figure()
+# plt.plot(tspan/60, simulation_result.observables['IkBa_obs'], label = 'IkBa_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
 plt.show()
 
 
@@ -917,10 +932,7 @@ plt.show()
 
 
 
-# for  j,ode in enumerate(model.odes):
-#     for i in range(len(model.species)):
-#        ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
-#     print j,":",ode
+
 #
 # for i,sp in enumerate(model.species):
 #     print i,":", sp

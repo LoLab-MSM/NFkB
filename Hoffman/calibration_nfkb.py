@@ -14,35 +14,63 @@ import scipy.interpolate
 import numpy as np
 
 
-# def run_sim_with_perturbations(sim, tspan, perturbations):
-#     perturbation_times = sorted(perturbations.keys())
-#
-#     for t in perturbation_times:
-#         if not any(np.isclose(t, tspan)):
-#             raise ValueError('Perturbation time %f is not defined in tspan'
-#                              % t)
-#
-#     # Create the tspans for each simulation stage
-#     tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
-#                               perturbation_times])
-#     for i in range(len(tspans) - 1):
-#         tspans[i] = np.append(tspans[i], tspans[i + 1][0])
-#
-#     # Do an initial simulation with the above setup until the point at which
-#     # we want to change a parameter (perturbation_time)
-#     res = sim.run(tspan=tspans[0])
-#
-#     df_out = res.dataframe
-#
-#     for i, t in enumerate(perturbation_times, 1):
-#         res = sim.run(initials=res.species[-1],
-#                       param_values=perturbation_params[t],
-#                       tspan=tspans[i])
-#
-#         df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
-#
-#     return df_out
+def run_sim_with_perturbations(sim, tspan, perturbations):
+    perturbation_times = sorted(perturbations.keys())
 
+    for t in perturbation_times:
+        if not any(np.isclose(t, tspan)):
+            raise ValueError('Perturbation time %f is not defined in tspan'
+                             % t)
+
+    # Create the tspans for each simulation stage
+    tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
+                              perturbation_times])
+    for i in range(len(tspans) - 1):
+        tspans[i] = np.append(tspans[i], tspans[i + 1][0])
+
+    # Do an initial simulation with the above setup until the point at which
+    # we want to change a parameter (perturbation_time)
+    res = sim.run(tspan=tspans[0])
+
+    df_out = res.dataframe
+
+    for i, t in enumerate(perturbation_times, 1):
+        res = sim.run(initials=res.species[-1],
+                      param_values=perturbation_params[t],
+                      tspan=tspans[i])
+
+        df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
+
+    return df_out
+
+data = pd.read_csv('/Users/geenaildefonso/data_ikk.csv')
+IKK_flux = tuple(data.loc[:, "IKK_flux"])
+print(np.transpose(IKK_flux))
+# print(IKK.shape)
+# print(IKK)
+# my_dict = {}
+#
+# # you have ten values, so loop using range
+# for i in range(721):
+# 	my_dict[i] = {'some_key': IKK_flux[i]}
+#
+# # print("MY DICT IN SORTED TUPLE FORM\n")
+# print(sorted(my_dict.items(), key=lambda x: x[0]))
+
+# -----------------------------
+# convert outer key values into inner key values
+# {int: {'some_key': float} } --> {float: {'some_key': int} }
+
+
+# make new dict
+# my_new_dict = {}
+#
+# for keys in my_dict:
+# 	my_new_key = my_dict[keys]['some_key']
+# 	my_new_dict[my_new_key] = {'some_key': keys}
+#
+# print("\n\nMY NEW DICT IN SORTED TUPLE FORM\n")
+# print(sorted(my_new_dict.items(), key=lambda x: x[0]))
 
 
 
@@ -207,7 +235,7 @@ Parameter('IKKi_0', 0.0013) #TRADD-TRAF-RIP
 Initial(IKK(state = 'ai'), IKKi_0)
 
 
-Parameter('TNF_0', .00196) #TNF
+Parameter('TNF_0', .2) #TNF
 Initial(TNF(c = None, tnfr = None), TNF_0)
 
 Parameter('TNFRM_0', 0.0) #TRADD-TRAF-RIP
@@ -259,10 +287,10 @@ Parameter('hill', 3)
 # Parameter('b', 0)
 # Parameter('e', 0)
 # Parameter('d', 0)
-Parameter('a', 8)
-Parameter('b', 0.02)
-Parameter('e', 0.3)
-Parameter('d', 0.025)
+# Parameter('a', 8)
+# Parameter('b', 0.02)
+# Parameter('e', 0.3)
+# Parameter('d', 0.025)
 
 Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 
@@ -272,10 +300,10 @@ Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 # Parameter('e_NFkBn', 0)
 # Parameter('d_NFkBn', 0)
 
-# Parameter('a', 0)
-# Parameter('b', 0)
-# Parameter('e', 0)
-# Parameter('d', 0)
+Parameter('a', 0)
+Parameter('b', 0)
+Parameter('e', 0)
+Parameter('d', 0)
 
 Expression('a_NFkBn', a*model.observables['NFkBn_free']**(hill))
 Expression('b_NFkBn', b*model.observables['NFkBn_free']**(hill))
@@ -286,6 +314,26 @@ Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
 Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
 Rule('en_mRNA', None >> IkBe_mRNA(), e_NFkBn)
 Rule('dn_mRNA', None >> IkBd_mRNA(), d_NFkBn)
+#
+# my_dict = {}
+# #
+# # # you have ten values, so loop using range
+# for i in range(721):
+# 	my_dict[i] = {'': IKK_flux[i]}
+#
+# #
+# # # print("MY DICT IN SORTED TUPLE FORM\n")
+# # print(sorted(my_dict.items(), key=lambda x: x[0]))
+# #
+# perturbation_params = {sorted(my_dict.items(), key=lambda x: x[0])}
+
+
+
+# perturbation_params = {
+#     10: {'a_NFkBn': 8*model.observables['NFkBn_free']**3},
+#     37: {'b_NFkBn': .02*model.observables['NFkBn_free']**3, 'e_NFkBn': .3*model.observables['NFkBn_free']**3},
+#     90: {'d_NFkBn': .025*model.observables['NFkBn_free']**3}
+# }
 
 
 #A20 mRNA and Protein Synthesis and Degradation Reactions
@@ -315,11 +363,7 @@ Parameter('nfkb_synthb', 0)
 Parameter('nfkb_synthe', 0)
 Parameter('nfkb_synthd', 0)
 
-# perturbation_params = {
-#     10: {'a_NFkBn': 8*model.observables['NFkBn_free']**3},
-#     37: {'b_NFkBn': .02*model.observables['NFkBn_free']**3, 'e_NFkBn': .3*model.observables['NFkBn_free']**3},
-#     90: {'d_NFkBn': .025*model.observables['NFkBn_free']**3}
-# }
+
 
 # IkB mRNA and protein synthesis reactions
 
@@ -451,10 +495,26 @@ Parameter('and_c_n', 0.36)
 Parameter('bnd_c_n', 0.12)
 Parameter('end_c_n', 0.18)
 Parameter('dnd_c_n', 0.18*.01)
+# Parameter('IKK_boom', 0)
+
+# Expression('IKK_ikba_flux', IKK_boom*a_f_deg)
+# Expression('IKK_ikbb_flux', IKK_boom*b_f_deg)
+# Expression('IKK_ikbe_flux', IKK_boom*e_f_deg)
 
 Expression('IKK_ikba_flux', model.observables['IKKa_obs']*a_f_deg)
 Expression('IKK_ikbb_flux', model.observables['IKKa_obs']*b_f_deg)
 Expression('IKK_ikbe_flux', model.observables['IKKa_obs']*e_f_deg)
+#
+# my_dict = {}
+# #
+# # # you have ten values, so loop using range
+# for i in range(721):
+#     my_dict[i] = {'IKK_boom': IKK_flux[i]}
+#
+# #
+# # # print("MY DICT IN SORTED TUPLE FORM\n")
+# # print(sorted(my_dict.items(), key=lambda x: x[0]))
+# perturbation_params = sorted(my_dict.items(), key=lambda x: x[0])
 # for i in tuple(range(721)):
 #     perturbation_params = {
 #         i: {'a_f_deg': [w*.36 for w in IKK_flux]}
@@ -514,7 +574,7 @@ Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), 
 # def tnf_independent_to_c1():
 Parameter('synth_tnfrm', 2e-7)
 Parameter('deg_tnfrm', 0.0058)
-Parameter('tnfr_f_tnfrm', 1e-5*3) # times 6
+Parameter('tnfr_f_tnfrm', 1e-5*6) # times 6
 Parameter('tnfr_r_tnfrm', 0.1)
 Parameter('deg_TNFR', 0.023)
 Parameter('TNFR_TTR_f_C1', 100.0)
@@ -525,7 +585,7 @@ Parameter('C1_f_A20', 1000.0)
 Parameter('C1_f_TNFR_TTR', 0.1)
 Parameter('C1_i_deg', 0.023)
 Parameter('C1_a_deg', 0.023)
-Observable('TNFRM_obs', TNFRM())
+# Observable('TNFRM_obs', TNFRM())
 
 # Expression('tnfrm_rule', tnfr_f_tnfrm/(TNFRM_obs)**2)
 # None >> tnfrm
@@ -533,8 +593,8 @@ Observable('TNFRM_obs', TNFRM())
 # 3*tnfrm <> tnfr
 # tnfr >> None
 
-Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
-Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
+# Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
+# Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
 # Rule('TNFR_3tnfrm', TNFRM() + TNFRM() + TNFRM() <> TNFR(tnf = None), tnfr_f_tnfrm, tnfr_r_tnfrm)
 
 # Parameter('tnfrm_none', 3*1e-05)
@@ -552,11 +612,11 @@ Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
 # Rule('six', TNF(c = None, tnfr = None) >> None, tnf_tnf_none)
 # Rule('seven', None >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), none_tnfrtnf)
 
-# Rule('tnfrm3_to_TNFR', TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = None), tnfr_f_tnfrm)
-# Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() + TNFRM() + TNFRM(), tnfr_r_tnfrm)
+Rule('tnfrm3_to_TNFR', TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = None), tnfr_f_tnfrm)
+Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() + TNFRM() + TNFRM(), tnfr_r_tnfrm)
 
-Rule('tnfrm3_to_TNFR', TNFRM()  >> TNFR(tnf = None), tnfr_f_tnfrm)
-Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() , tnfr_r_tnfrm)
+# Rule('tnfrm3_to_TNFR', TNFRM()  >> TNFR(tnf = None), tnfr_f_tnfrm)
+# Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() , tnfr_r_tnfrm)
 
 
 
@@ -579,7 +639,7 @@ Rule('C1a_deg', C1(tnf = None, state = 'a') >> None, C1_a_deg)
 #TNF-Dependent Complex 1 Activity Reactions
 # def tnf_dependent_to_c1():
 Parameter('tnf_deg', 0.0154)
-Parameter('tnf_tnfrm_f_TNFRtnf', 1100.0*3) # times 2
+Parameter('tnf_tnfrm_f_TNFRtnf', 1100.0*6) # times 2
 Parameter('tnf_TNFR_f_TNFRtnf', 1100.0)
 Parameter('tnf_TNFR_r_TNFRtnf', 0.021)
 Parameter('deg_TNFRtnf', 0.023)
@@ -598,8 +658,8 @@ Parameter('C1itnf_r_C1atnf', 2.0)
 Rule('deg_tnf', TNF(c = None, tnfr = None) >> None, tnf_deg)
 
 # Expression('tnfrmtnf_rule', tnf_tnfrm_f_TNFRtnf/(TNFRM_obs)**2)
-# Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
-Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM()  >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
+Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
+# Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM()  >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
 
 
 
@@ -676,61 +736,61 @@ Rule('IKKai_IKKi', IKK(state = 'ai') >> IKK(state = 'i'), IKKai_f_IKKi)
 
 #Dictionary to substitute in species names to match matlab files
 # def species_dict():
-# species_dict = {
-#     0: 'IkBa',
-#     1: 'IkBan',
-#     2: 'IkBaNFkB',
-#     3: 'IkBaNFkBn',
-#     4: 'IkBat',
-#     5: 'IkBb',
-#     6: 'IkBbn',
-#     7: 'IkBbNFkB',
-#     8: 'IkBbNFkBn',
-#     9: 'IkBbt',
-#     10: 'IkBe',
-#     11: 'IkBen',
-#     12: 'IkBeNFkB',
-#     13: 'IkBeNFkBn',
-#     14: 'IkBet',
-#     15: 'IkBd',
-#     16: 'IkBdn',
-#     17: 'IkBdNFkB',
-#     18: 'IkBdNFkBn',
-#     19: 'IkBdt',
-#     20: 'NFkB',
-#     21: 'NFkBn',
-#     22: 'IKKK_off',
-#     23: 'IKKK',
-#     24: 'IKK_off',
-#     25: 'IKK',
-#     26: 'IKK_i',
-#     27: 'TNF',
-#     28: 'tnfrm',
-#     29: 'TNFR',
-#     30: 'TNFRtnf',
-#     31: 'C1',
-#     32: 'C1_off',
-#     33: 'C1tnf',
-#     34: 'C1tnf_off',
-#     35: 'TTR',
-#     36: 'a20',
-#     37: 'a20t',
-#     38: 'SOURCE',
-#     39: 'SINK'
-# }
+species_dict = {
+    0: 'IkBa',
+    1: 'IkBan',
+    2: 'IkBaNFkB',
+    3: 'IkBaNFkBn',
+    4: 'IkBat',
+    5: 'IkBb',
+    6: 'IkBbn',
+    7: 'IkBbNFkB',
+    8: 'IkBbNFkBn',
+    9: 'IkBbt',
+    10: 'IkBe',
+    11: 'IkBen',
+    12: 'IkBeNFkB',
+    13: 'IkBeNFkBn',
+    14: 'IkBet',
+    15: 'IkBd',
+    16: 'IkBdn',
+    17: 'IkBdNFkB',
+    18: 'IkBdNFkBn',
+    19: 'IkBdt',
+    20: 'NFkB',
+    21: 'NFkBn',
+    22: 'IKKK_off',
+    23: 'IKKK',
+    24: 'IKK_off',
+    25: 'IKK',
+    26: 'IKK_i',
+    27: 'TNF',
+    28: 'tnfrm',
+    29: 'TNFR',
+    30: 'TNFRtnf',
+    31: 'C1',
+    32: 'C1_off',
+    33: 'C1tnf',
+    34: 'C1tnf_off',
+    35: 'TTR',
+    36: 'a20',
+    37: 'a20t',
+    38: 'SOURCE',
+    39: 'SINK'
+}
 
 # Observable('TNF_obs', TNF(c = None, tnfr = None))
 # Observable('IKKK_obs', IKKK(state = 'a'))
 # Observable('IKKKoff_obs', IKKK(state = 'i'))
 # # Observable('IkBd_obs', IkBd(nfkb=None, S='C'))
 # Observable('IKK_obs', IKK(state = 'a'))
-# Observable('NFkBn_obs', NFkB(ikb=None, S='N'))
+Observable('NFkBn_obs', NFkB(ikb=None, S='N'))
 # Observable('NFkB_obs', NFkB(ikb=None, S='C'))
 # Observable('A20t_obs', A20t())
 # Observable('A20_obs', A20())
-# Observable('TNFRM_obs', TNFRM())
+Observable('TNFRM_obs', TNFRM())
 # Observable('TNFRTNF_obs', TNF(c = None, tnfr = 1)%TNFR(tnf = 1))
-# Observable('TNFR_obs', TNFR(tnf = None))
+Observable('TNFR_obs', TNFR(tnf = None))
 # Observable('TTR_obs', TTR())
 # Observable('C1_obs', C1(tnf = None, state = 'a'))
 # Observable('C1off_obs', C1(tnf = None, state = 'i'))
@@ -784,11 +844,32 @@ Observable('IkBd_obs', IkBd(nfkb = None, S='C'))
 # Observable('IkBdNFkB_obs', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C'))
 # Observable('IkBdNFkBn_obs', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N'))
 
-# tspan = np.linspace(0, 720, 721)
+tspan = np.linspace(0, 720, 721)
 # print(len(tspan))
 # print(tspan)
-# sim = ScipyOdeSimulator(model, tspan = tspan)
-# simulation_result = sim.run()
+sim = ScipyOdeSimulator(model, tspan = tspan, integrator_options = { 'atol' : 1e-16 , 'rtol' : 1e-16}, integrator='lsoda')
+simulation_result = sim.run()
+# df = run_sim_with_perturbations(sim, tspan, perturbation_params)
+# print(df.shape)
+# print(len(df['__s21']))
+# print(df['__s21'])
+
+for  j,ode in enumerate(model.odes):
+    for i in range(len(model.species)):
+       ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
+    print j,":",ode
+
+
+print(model.parameters)
+print(len(model.reactions))
+#
+# plt.figure()
+# plt.plot(tspan/60, df['__s21'], label = 'NFkBn_obs')
+# plt.xlabel("Time (in hours)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+# plt.show()
 
 
 # tspan = np.linspace(0, 720, 721)
@@ -799,22 +880,37 @@ Observable('IkBd_obs', IkBd(nfkb = None, S='C'))
 # #
 # print('TTR conc')
 # print(x['TTR_obs'])
-#
-# plt.figure()
-# plt.plot(tspan/60, simulation_result['IKK_obs'], label = 'IKK_obs')
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
-# # plt.show()
-# #
-# plt.figure()
-# plt.plot(tspan/60, simulation_result.observables['IkBa_obs'], label = 'IkBa_obs')
-# plt.xlabel("Time (in hours)", fontsize=16)
-# plt.ylabel("Concentration", fontsize=16)
-# # plt.ylim(ymin = -10, ymax =100)
-# plt.legend(loc=0)
-# plt.show()
+
+plt.figure()
+plt.plot(tspan, simulation_result.observables['NFkBn_obs'], label = 'NFkBn_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+
+plt.figure()
+plt.plot(tspan, simulation_result.observables['TNFRM_obs'], label = 'TNFRM_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+plt.figure()
+plt.plot(tspan, simulation_result.observables['TNFR_obs'], label = 'TNFR_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+plt.figure()
+plt.plot(tspan, simulation_result.observables['IKKa_obs'], label = 'IKK_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+plt.show()
 #
 # plt.figure()
 # plt.plot(tspan/60, x['IkBaNFkB_obs'], label = 'IkBaNFkB_obs')
