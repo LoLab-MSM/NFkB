@@ -1,4 +1,3 @@
-
 from pysb import *
 import pandas as pd
 from pysb.core import *
@@ -9,7 +8,10 @@ import numpy as np
 from scipy import interpolate
 from scipy.interpolate import *
 import scipy.interpolate
+#from pysb.simulator import ScipyOdeSimulator
 import numpy as np
+
+
 Model ()
 
 #Declaration of monomers
@@ -168,6 +170,7 @@ Initial(IKK(state = 'a'), IKK_0)
 Parameter('IKKi_0', 0.0013) #TRADD-TRAF-RIP
 Initial(IKK(state = 'ai'), IKKi_0)
 
+
 Parameter('TNF_0', .2) #TNF
 Initial(TNF(c = None, tnfr = None), TNF_0)
 
@@ -205,8 +208,6 @@ Initial(A20t(), a20t_0)
 # Initial(TNF(c = None, tnfr = None), TNF_0)
 
 
-
-
 # def  ikb_mrna_to_ikb():
 Parameter('psynth_a', 7e-5)
 Parameter('psynth_b', 1e-5)
@@ -216,14 +217,12 @@ Rule('a_synth', None >> IkBa_mRNA(), psynth_a)
 Rule('b_synth', None >> IkBb_mRNA(), psynth_b)
 Rule('e_synth', None >> IkBe_mRNA(), psynth_e)
 Rule('d_synth', None >> IkBd_mRNA(), psynth_d)
-#
-# Rule('a_synth', NFkB(ikb=None, S='N') >> IkBa_mRNA() + NFkB(ikb=None, S='N'), psynth_a)
-# Rule('b_synth', NFkB(ikb=None, S='N') >> IkBb_mRNA() + NFkB(ikb=None, S='N'), psynth_b)
-# Rule('e_synth', NFkB(ikb=None, S='N') >> IkBe_mRNA() + NFkB(ikb=None, S='N'), psynth_e)
-# Rule('d_synth', NFkB(ikb=None, S='N') >> IkBd_mRNA() + NFkB(ikb=None, S='N'), psynth_d)
-
 
 Parameter('hill', 3)
+# Parameter('a', 0)
+# Parameter('b', 0)
+# Parameter('e', 0)
+# Parameter('d', 0)
 Parameter('a', 8)
 Parameter('b', 0.02)
 Parameter('e', 0.3)
@@ -231,20 +230,75 @@ Parameter('d', 0.025)
 
 Observable('NFkBn_free', NFkB(ikb=None, S='N'))
 
-Expression('a_NFkBn', a*(NFkBn_free)**(hill))
-Expression('b_NFkBn', b*(NFkBn_free)**(hill))
-Expression('e_NFkBn', e*(NFkBn_free)**(hill))
-Expression('d_NFkBn', d*(NFkBn_free)**(hill))
+# Parameter('zero', 0)
+# Parameter('a_NFkBn', 0)
+# Parameter('b_NFkBn', 0)
+# Parameter('e_NFkBn', 0)
+# Parameter('d_NFkBn', 0)
+
+# Parameter('a', 0)
+# Parameter('b', 0)
+# Parameter('e', 0)
+# Parameter('d', 0)
+
+Expression('a_NFkBn', a*model.observables['NFkBn_free']**(hill))
+Expression('b_NFkBn', b*model.observables['NFkBn_free']**(hill))
+Expression('e_NFkBn', e*model.observables['NFkBn_free']**(hill))
+Expression('d_NFkBn', d*model.observables['NFkBn_free']**(hill))
 
 Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
 Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
 Rule('en_mRNA', None >> IkBe_mRNA(), e_NFkBn)
 Rule('dn_mRNA', None >> IkBd_mRNA(), d_NFkBn)
+#
+# my_dict = {}
+# #
+# # # you have ten values, so loop using range
+# for i in range(721):
+# 	my_dict[i] = {'': IKK_flux[i]}
+#
+# #
+# # # print("MY DICT IN SORTED TUPLE FORM\n")
+# # print(sorted(my_dict.items(), key=lambda x: x[0]))
+# #
+# perturbation_params = {sorted(my_dict.items(), key=lambda x: x[0])}
 
-# Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
-# Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
-# Rule('en_mRNA', None >> IkBe_mRNA(), e_NFkBn)
-# Rule('dn_mRNA', None >> IkBd_mRNA(), d_NFkBn)
+
+
+# perturbation_params = {
+#     10: {'a_NFkBn': 8*model.observables['NFkBn_free']**3},
+#     37: {'b_NFkBn': .02*model.observables['NFkBn_free']**3, 'e_NFkBn': .3*model.observables['NFkBn_free']**3},
+#     90: {'d_NFkBn': .025*model.observables['NFkBn_free']**3}
+# }
+
+
+#A20 mRNA and Protein Synthesis and Degradation Reactions
+# def a20_mrna_to_a20():
+Parameter('A20_mRNA', 2e-6)
+Parameter('A20n', 0.4)
+Parameter('A20_mRNA_c_deg', 0.035)
+Parameter('a1d_c_deg', 0.36)
+Parameter('A20_synth', 0.25)
+Parameter('A20_deg', 0.0029)
+
+Observable('obs_A20t', A20t())
+
+Expression('A20t_NFkBn', A20n*(NFkBn_free)**(hill))
+Expression('A20_synthesis', A20_synth*model.observables['obs_A20t'])
+
+Rule('A20t_synth', None >> A20t(), A20_mRNA)
+Rule('A20t_mediated_nfkbn', None >> A20t(), A20t_NFkBn)
+Rule('A20t_deg', A20t() >> None, A20_mRNA_c_deg)
+
+Rule('synth_A20', None >> A20(), A20_synthesis)
+Rule('deg_A20', A20() >> None, A20_deg)
+
+
+
+Parameter('nfkb_synthb', 0)
+Parameter('nfkb_synthe', 0)
+Parameter('nfkb_synthd', 0)
+
 
 
 # IkB mRNA and protein synthesis reactions
@@ -282,6 +336,7 @@ Rule('d_psynth', IkBd_mRNA() >> IkBd(nfkb=None, S='C') + IkBd_mRNA(), synthd)
 
 #IkB(a,b,e) association and dissociation from IKK2 and IkBd association and dissociation from IKK2
 # def ikb_assoc_diss_nfkb():
+
 Parameter('IkB_IKKf', 30)
 Parameter('IkB_IKKr', 6e-5)
 Rule('an_adc', IkBa(nfkb=None, S='C') + NFkB(ikb=None, S='C') <> IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C'), IkB_IKKf, IkB_IKKr)
@@ -351,7 +406,7 @@ Rule('dd_n', IkBd(nfkb=None, S='N') >> None, d_dn)
 Parameter('c_bn', 0.00006)
 Parameter('n_bn', 0.00006)
 
-Rule('an_c', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
+Rule('an_c', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C') , c_bn)
 Rule('bn_c', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
 Rule('en_c', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
 Rule('dn_c', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), c_bn)
@@ -365,37 +420,6 @@ Rule('dn_n', IkBd(nfkb=1, S='N')%NFkB(ikb=1, S='N') >> NFkB(ikb=None, S='N'), n_
 
 #IKK-mediated IkB degradation reactions
 # def ikb_ikk_mediated_deg():
-# Parameter('a_f_deg', 0.36)
-# Parameter('b_f_deg', 0.12)
-# Parameter('e_f_deg', 0.18)
-# Parameter('d_f_deg', 0.18)
-#
-# Parameter('and_c_n', 0.36)
-# Parameter('bnd_c_n', 0.12)
-# Parameter('end_c_n', 0.18)
-# Parameter('dnd_c_n', 0.18)
-#
-# # IkBa >> None
-# # IkBb >> None
-# # IkBe >> None
-# # IkBd >> None
-#
-# # IkBa : NFkB >> NFkB
-# # IkBb : NFkB >> NFkB
-# # IkBe : NFkB >> NFkB
-# # IkBd : NFkB >> NFkB
-#
-# Rule('a_c_deg', IkBa(nfkb=None, S='C') >> None, a_f_deg)
-# Rule('b_c_deg', IkBb(nfkb=None, S='C') >> None, b_f_deg)
-# Rule('e_c_deg', IkBe(nfkb=None, S='C') >> None, e_f_deg)
-# Rule('d_c_deg', IkBd(nfkb=None, S='C') >> None, d_f_deg)
-#
-# Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), and_c_n)
-# Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), bnd_c_n)
-# Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), end_c_n)
-# Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
-
-
 Observable('IKKa_obs', IKK(state = 'a'))
 
 Parameter('a_f_deg', 0.36/.1)
@@ -458,34 +482,36 @@ Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), 
 Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
 
 
-#A20 mRNA and Protein Synthesis and Degradation Reactions
-# def a20_mrna_to_a20():
-Parameter('A20_mRNA', 2e-6)
-Parameter('A20n', 0.4)
-Parameter('A20_mRNA_c_deg', 0.035)
-Parameter('a1d_c_deg', 0.36)
-Parameter('A20_synth', 0.25)
-Parameter('A20_deg', 0.0029)
+# Rule('a_c_deg', IkBa(nfkb=None, S='C') >> None, IKK_ikba_flux)
+# Rule('b_c_deg', IkBb(nfkb=None, S='C') >> None, b_f_deg)
+# Rule('e_c_deg', IkBe(nfkb=None, S='C') >> None, e_f_deg)
+# Rule('d_c_deg', IkBd(nfkb=None, S='C') >> None, d_f_deg)
+#
+# Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), and_c_n)
+# Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), bnd_c_n)
+# Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), end_c_n)
+# Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), dnd_c_n)
 
-Observable('obs_A20t', A20t())
+#
+# Rule('a_c_deg', IkBa(nfkb=None, S='C') + IKK(state = 'a') >> IKK(state = 'a'), a_f_deg)
+# Rule('b_c_deg', IkBb(nfkb=None, S='C') + IKK(state = 'a') >> IKK(state = 'a'), b_f_deg)
+# Rule('e_c_deg', IkBe(nfkb=None, S='C') + IKK(state = 'a') >> IKK(state = 'a'), e_f_deg)
+# Rule('d_c_deg', IkBd(nfkb=None, S='C') + IKK(state = 'a') >> IKK(state = 'a'), d_f_deg)
+#
+# Rule('an_c_n', IkBa(nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK(state = 'a') >> NFkB(ikb=None, S='C') + IKK(state = 'a'), and_c_n)
+# Rule('bn_c_n', IkBb(nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK(state = 'a')>> NFkB(ikb=None, S='C') + IKK(state = 'a'), bnd_c_n)
+# Rule('en_c_n', IkBe(nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK(state = 'a') >> NFkB(ikb=None, S='C') + IKK(state = 'a'), end_c_n)
+# Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') + IKK(state = 'a')>> NFkB(ikb=None, S='C') + IKK(state = 'a'), dnd_c_n)
 
-Expression('A20t_NFkBn', A20n*(NFkBn_free)**(hill))
-Expression('A20_synthesis', A20_synth*obs_A20t)
 
-Rule('A20t_synth', None >> A20t(), A20_mRNA)
-Rule('A20t_mediated_nfkbn', None >> A20t(), A20t_NFkBn)
-Rule('A20t_deg', A20t() >> None, A20_mRNA_c_deg)
-
-Rule('synth_A20', None >> A20(), A20_synthesis)
-Rule('deg_A20', A20() >> None, A20_deg)
 
 #IKK Activation Module
 #TNF-Independent Complex 1 Activity Reactions
 # def tnf_independent_to_c1():
 Parameter('synth_tnfrm', 2e-7)
 Parameter('deg_tnfrm', 0.0058)
-Parameter('tnfr_f_tnfrm', 1e-5*3) # times 2
-Parameter('tnfr_r_tnfrm', 0.1*3)
+Parameter('tnfr_f_tnfrm', 1e-5) # times 6
+Parameter('tnfr_r_tnfrm', 0.1)
 Parameter('deg_TNFR', 0.023)
 Parameter('TNFR_TTR_f_C1', 100.0)
 Parameter('TNFR_TTR_r_C1', 0.1)
@@ -495,20 +521,36 @@ Parameter('C1_f_A20', 1000.0)
 Parameter('C1_f_TNFR_TTR', 0.1)
 Parameter('C1_i_deg', 0.023)
 Parameter('C1_a_deg', 0.023)
+# Observable('TNFRM_obs', TNFRM())
 
+# Expression('tnfrm_rule', tnfr_f_tnfrm/(TNFRM_obs)**2)
 # None >> tnfrm
 # tnfrm >> None
 # 3*tnfrm <> tnfr
 # tnfr >> None
 
-Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
-Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
+# Rule('tnfrm_synth', None >> TNFRM(), synth_tnfrm)
+# Rule('tnfrm_deg', TNFRM() >> None, deg_tnfrm)
 # Rule('TNFR_3tnfrm', TNFRM() + TNFRM() + TNFRM() <> TNFR(tnf = None), tnfr_f_tnfrm, tnfr_r_tnfrm)
 
+# Parameter('tnfrm_none', 3*1e-05)
+# Parameter('none_tnfr', 1e-05)
+# Parameter('none_tnfrm', 3*.1)
+# Parameter('tnfr_none', .1)
+# Parameter('tnfrm_tnf_none', 3*1100)
+# Parameter('tnf_tnf_none', 1100)
+# Parameter('none_tnfrtnf', 1100)
+# Rule('one', TNFRM() >> None, tnfrm_none)
+# Rule('two', None >> TNFR(tnf = None), none_tnfr)
+# Rule('three', None >> TNFRM(), none_tnfrm)
+# Rule('four', TNFR(tnf = None) >> None, tnfr_none)
+# Rule('five', TNFRM() >> None, tnfrm_tnf_none)
+# Rule('six', TNF(c = None, tnfr = None) >> None, tnf_tnf_none)
+# Rule('seven', None >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), none_tnfrtnf)
 
 # Rule('tnfrm3_to_TNFR', TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = None), tnfr_f_tnfrm)
 # Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() + TNFRM() + TNFRM(), tnfr_r_tnfrm)
-#
+
 Rule('tnfrm3_to_TNFR', TNFRM()  >> TNFR(tnf = None), tnfr_f_tnfrm)
 Rule('TNFR_to_tnfrm3', TNFR(tnf = None) >> TNFRM() , tnfr_r_tnfrm)
 
@@ -533,7 +575,7 @@ Rule('C1a_deg', C1(tnf = None, state = 'a') >> None, C1_a_deg)
 #TNF-Dependent Complex 1 Activity Reactions
 # def tnf_dependent_to_c1():
 Parameter('tnf_deg', 0.0154)
-Parameter('tnf_tnfrm_f_TNFRtnf', 1100.0*3) # times 2
+Parameter('tnf_tnfrm_f_TNFRtnf', 1100) # times 2
 Parameter('tnf_TNFR_f_TNFRtnf', 1100.0)
 Parameter('tnf_TNFR_r_TNFRtnf', 0.021)
 Parameter('deg_TNFRtnf', 0.023)
@@ -551,7 +593,7 @@ Parameter('C1itnf_r_C1atnf', 2.0)
 
 Rule('deg_tnf', TNF(c = None, tnfr = None) >> None, tnf_deg)
 
-
+# Expression('tnfrmtnf_rule', tnf_tnfrm_f_TNFRtnf/(TNFRM_obs)**2)
 # Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM() + TNFRM() + TNFRM() >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
 Rule('tnf_tnfrm_TNFRtnf', TNF(c = None, tnfr = None) + TNFRM()  >> TNFR(tnf = 1)%TNF(c=None, tnfr = 1), tnf_tnfrm_f_TNFRtnf)
 
@@ -626,6 +668,9 @@ Rule('IKKi_IKKaIKKK', IKK(state = 'i') + IKKK(state = 'a') >> IKK(state = 'a') +
 Rule('IKKi_IKKai', IKK(state = 'a') >> IKK(state = 'ai'), IKKa_f_IKKai)
 Rule('IKKai_IKKi', IKK(state = 'ai') >> IKK(state = 'i'), IKKai_f_IKKi)
 
+
+#Dictionary to substitute in species names to match matlab files
+# def species_dict():
 species_dict = {
     0: 'IkBa',
     1: 'IkBan',
@@ -686,7 +731,9 @@ Observable('TNFR_obs', TNFR(tnf = None))
 # Observable('C1off_obs', C1(tnf = None, state = 'i'))
 # Observable('C1tnf_obs', C1(tnf = 1, state = 'a')%TNF(c = 1, tnfr = None))
 # Observable('C1tnfoff_obs', C1(tnf = 1, state = 'i')%TNF(c = 1, tnfr = None))
-
+#
+#
+#
 # Observable('IKKa_obs', IKK(state = 'a'))
 # Observable('IKKi_obs', IKK(state = 'i'))
 # Observable('IKKai_obs', IKK(state = 'ai'))
@@ -708,7 +755,7 @@ Observable('IkBb_mRNA_obs', IkBb_mRNA())
 Observable('IkBe_mRNA_obs', IkBe_mRNA())
 Observable('IkBd_mRNA_obs', IkBd_mRNA())
 
-Observable('TNF_obs', TNF(c = None, tnfr = None))
+# Observable('TNF_obs', TNF(c = None, tnfr = None))
 # Observable('A20_obs', A20())
 
 Observable('IkBa_obs', IkBa(nfkb = None, S='C'))
@@ -735,21 +782,23 @@ Observable('IkBd_obs', IkBd(nfkb = None, S='C'))
 tspan = np.linspace(0, 720, 721)
 # print(len(tspan))
 # print(tspan)
-sim = ScipyOdeSimulator(model, tspan = tspan)
-simulation_result = sim.run()
+# sim = ScipyOdeSimulator(model, tspan = tspan)
+# simulation_result = sim.run()
+
+x = odesolve(model, tspan, verbose = True)
 # df = run_sim_with_perturbations(sim, tspan, perturbation_params)
 # print(df.shape)
 # print(len(df['__s21']))
 # print(df['__s21'])
 
-for  j,ode in enumerate(model.odes):
-    for i in range(len(model.species)):
-       ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
-    print j,":",ode
-
-
-print(model.parameters)
-print(len(model.reactions))
+# for  j,ode in enumerate(model.odes):
+#     for i in range(len(model.species)):
+#        ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
+#     print j,":",ode
+#
+#
+# print(model.parameters)
+# print(len(model.reactions))
 #
 # plt.figure()
 # plt.plot(tspan/60, df['__s21'], label = 'NFkBn_obs')
@@ -768,97 +817,66 @@ print(len(model.reactions))
 # #
 # print('TTR conc')
 # print(x['TTR_obs'])
-# fig = plt.figure()
-# ax1 = fig.add_subplot(231)
-#
-#
-# plt.figure(1)
-# plt
-# ax1.plot(tspan, simulation_result.observables['NFkBn_obs'], label = 'NFkBn_obs')
-# ax1.xlabel("Time (in min)", fontsize=16)
-# ax1.ylabel("Concentration", fontsize=16)
-#
-# ax2 = fig.add_subplot(232)
-# ax2.plot(tspan, simulation_result.observables['TNFRM_obs'], label = 'TNFRM_obs')
-# ax2.xlabel("Time (in min)", fontsize=16)
-# ax2.ylabel("Concentration", fontsize=16)
-#
-# ax3 = fig.add_subplot(233)
-# ax3.plot(tspan, simulation_result.observables['TNFR_obs'], label = 'TNFR_obs')
-# ax3.xlabel("Time (in min)", fontsize=16)
-# ax3.ylabel("Concentration", fontsize=16)
-#
-# ax4 = fig.add_subplot(234)
-# ax4.plot(tspan, simulation_result.observables['IkBd_obs'], label = 'IkBd_obs')
-# ax4.xlabel("Time (in min)", fontsize=16)
-# ax4.ylabel("Concentration", fontsize=16)
-#
-# ax5 = fig.add_subplot(235)
-# ax5.plot(tspan, simulation_result.observables['IKKa_obs'], label = 'IKKa_obs')
-# ax5.xlabel("Time (in min)", fontsize=16)
-# ax5.ylabel("Concentration", fontsize=16)
-#
-# ax6 = fig.add_subplot(236)
-# ax6.plot(tspan, simulation_result.observables['A20_obs'], label = 'A20_obs')
-# ax6.xlabel("Time (in min)", fontsize=16)
-# ax6.ylabel("Concentration", fontsize=16)
-#
-# plt.tight_layout()
 
 
-plt.figure(figsize = (15,10))
-# plt.figure()
-plt.subplot(231)
-plt.plot(tspan/60, simulation_result.observables['TNF_obs'], marker = '*',label = 'TNF')
-plt.plot(tspan/60, simulation_result.observables['TNF_obs'], color = 'r', label = 'TNF_mat')
-plt.xlabel("Time (in min)", fontsize=10)
-plt.ylabel("Concentration", fontsize=10)
+plt.figure()
+plt.plot(tspan, x['NFkBn_obs'], label = 'NFkBn_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+
+plt.figure()
+plt.plot(tspan, x['TNFRM_obs'], label = 'TNFRM_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+
+plt.figure()
+plt.plot(tspan, x['TNFR_obs'], label = 'TNFR_obs')
+plt.xlabel("Time (in min)", fontsize=16)
+plt.ylabel("Concentration", fontsize=16)
 # plt.ylim(ymin = -10, ymax =100)
 plt.legend(loc=0)
 
 # plt.figure()
-plt.subplot(232)
-plt.plot(tspan/60, simulation_result.observables['TNFR_obs'],marker = '*',label = 'TNFR')
-plt.plot(tspan/60, simulation_result.observables['TNFR_obs'], color = 'r', label = 'TNFR_mat')
-plt.xlabel("Time (in min)", fontsize=10)
-plt.ylabel("Concentration", fontsize=10)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
+# plt.plot(tspan, simulation_result.observables['IKKa_obs'], label = 'IKK_obs')
+# plt.xlabel("Time (in min)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
 
-# plt.figure()
-plt.subplot(233)
-plt.plot(tspan/60, simulation_result.observables['IKKa_obs'],marker = '*', label = 'IKKa')
-plt.plot(tspan/60, simulation_result.observables['IKKa_obs'], color = 'r', label = 'IKKa_mat')
-plt.xlabel("Time (in min)", fontsize=10)
-plt.ylabel("Concentration", fontsize=10)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-
-plt.subplot(234)
-plt.plot(tspan/60, simulation_result.observables['NFkBn_obs'], marker = '*', label = 'NFkBn')
-plt.plot(tspan/60, simulation_result.observables['NFkBn_obs'],  color = 'r',label = 'NFkBn_mat')
-plt.xlabel("Time (in min)", fontsize=10)
-plt.ylabel("Concentration", fontsize=10)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-
-# plt.figure()
-plt.subplot(235)
-plt.plot(tspan/60, simulation_result.observables['obs_A20t'],marker = '*', label = 'A20')
-plt.plot(tspan/60, simulation_result.observables['obs_A20t'], color = 'r',label = 'A20_mat')
-plt.xlabel("Time (in min)", fontsize=10)
-plt.ylabel("Concentration", fontsize=10)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-
-# plt.figure()
-plt.subplot(236)
-plt.plot(tspan/60, simulation_result.observables['IkBa_obs'], marker = '*',label = 'IkBa')
-plt.plot(tspan/60, simulation_result.observables['IkBa_obs'], color = 'r', label = 'IkBa_mat')
-plt.xlabel("Time (in min)", fontsize=10)
-plt.ylabel("Concentration", fontsize=10)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-
-plt.tight_layout()
 plt.show()
+
+# plt.figure()
+# plt.plot(tspan, simulation_result.observables['NFkBn_obs'], label = 'NFkBn_obs')
+# plt.xlabel("Time (in min)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+#
+# plt.figure()
+# plt.plot(tspan, simulation_result.observables['TNFRM_obs'], label = 'TNFRM_obs')
+# plt.xlabel("Time (in min)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+# plt.figure()
+# plt.plot(tspan, simulation_result.observables['TNFR_obs'], label = 'TNFR_obs')
+# plt.xlabel("Time (in min)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
+#
+# # plt.figure()
+# # plt.plot(tspan, simulation_result.observables['IKKa_obs'], label = 'IKK_obs')
+# # plt.xlabel("Time (in min)", fontsize=16)
+# # plt.ylabel("Concentration", fontsize=16)
+# # # plt.ylim(ymin = -10, ymax =100)
+# # plt.legend(loc=0)
+#
+# plt.show()

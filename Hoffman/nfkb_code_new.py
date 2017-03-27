@@ -881,12 +881,12 @@ print(len(model.reactions))
 # print('TTR conc')
 # print(x['TTR_obs'])
 
-plt.figure()
-plt.plot(tspan, simulation_result.observables['NFkBn_obs'], label = 'NFkBn_obs')
-plt.xlabel("Time (in min)", fontsize=16)
-plt.ylabel("Concentration", fontsize=16)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
+# plt.figure()
+# plt.plot(tspan, simulation_result.observables['NFkBn_obs'], label = 'NFkBn_obs')
+# plt.xlabel("Time (in min)", fontsize=16)
+# plt.ylabel("Concentration", fontsize=16)
+# # plt.ylim(ymin = -10, ymax =100)
+# plt.legend(loc=0)
 
 
 plt.figure()

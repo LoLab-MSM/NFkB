@@ -46,16 +46,16 @@
 # print(sorted(my_new_dict.items(), key=lambda x: x[0]))
 
 
-
+#
 from pylab import *
 from ddeint import ddeint
 import matplotlib as plt
-# model = lambda Y, t:  -Y( t-3*cos( Y(t) )**2 )
-# tt = linspace(0, 30, 2000)
-# yy = ddeint(model, lambda t:1, tt)
-# print('plottin...')
-# plot(tt, yy)
-
+# # model = lambda Y, t:  -Y( t-3*cos( Y(t) )**2 )
+# # tt = linspace(0, 30, 2000)
+# # yy = ddeint(model, lambda t:1, tt)
+# # print('plottin...')
+# # plot(tt, yy)
+#
 def model(Y,t,d):
     # print(tuple(Y(t)))
     x,y = tuple(Y(t))
@@ -73,6 +73,57 @@ for d in [0]:
     plot(yy[:,0], yy[:,1], lw=2, label='delay = %.01f'%d)
 #
 legend()
+
+
+# import necessary libraries
+# import matplotlib.pyplot as plt
+# # show plots in notebook
+#
+# # define system in terms of separated differential equations
+# def f(x,y):
+#     return x**3 - y
+# def g(x,y):
+#     return x-y
+#
+# # initialize lists containing values
+# x = []
+# y = []
+#
+# #iv1, iv2 = initial values, dt = timestep, time = range
+# def sys(iv1, iv2, dt, time):
+#     # initial values:
+#     x.append(iv1)
+#     y.append(iv2)
+#     #z.append(iv3)
+#     # compute and fill lists
+#     for i in range(time):
+#         x.append(x[i] + (f(x[i],y[i])) * dt)
+#         y.append(y[i] + (g(x[i],y[i])) * dt)
+#         #z.append(z[i] + (h(x[i],y[i],z[i])) * dt)
+#     return x, y
+#
+# sys(3, 2, 0.01, 5)
+#
+# #plot
+# fig = plt.figure(figsize=(15,5))
+# fig.subplots_adjust(wspace = 0.5, hspace = 0.3)
+# ax1 = fig.add_subplot(1,2,1)
+# # ax2 = fig.add_subplot(1,2,2)
+#
+# ax1.plot(x, 'r-', label='predator')
+# ax1.plot(y, 'b-', label='prey')
+# #ax1.plot(z, 'g-', label='prey')
+# ax1.set_title("Dynamics in time")
+# ax1.set_xlabel("time")
+# ax1.grid()
+# ax1.legend(loc='best')
+
+# ax2.plot(x, y, color="blue")
+# ax2.set_xlabel("x")
+# ax2.set_ylabel("y")
+# ax2.set_title("Phase space")
+# ax2.grid()
+# plt.plot(t1, f(t1, w))
 
 
 # from pylab import *
