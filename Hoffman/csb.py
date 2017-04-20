@@ -10,35 +10,35 @@ import scipy.interpolate
 import pandas as pd
 #from pysb.simulator import ScipyOdeSimulator
 
-
-def run_sim_with_perturbations(sim, tspan, perturbations):
-    perturbation_times = sorted(perturbations.keys())
-
-    for t in perturbation_times:
-        if not any(np.isclose(t, tspan)):
-            raise ValueError('Perturbation time %f is not defined in tspan'
-                             % t)
-
-    # Create the tspans for each simulation stage
-    tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
-                              perturbation_times])
-    for i in range(len(tspans) - 1):
-        tspans[i] = np.append(tspans[i], tspans[i + 1][0])
-
-    # Do an initial simulation with the above setup until the point at which
-    # we want to change a parameter (perturbation_time)
-    res = sim.run(tspan=tspans[0])
-
-    df_out = res.dataframe
-
-    for i, t in enumerate(perturbation_times, 1):
-        res = sim.run(initials=res.species[-1],
-                      param_values=perturbation_params[t],
-                      tspan=tspans[i])
-
-        df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
-
-    return df_out
+#
+# def run_sim_with_perturbations(sim, tspan, perturbations):
+#     perturbation_times = sorted(perturbations.keys())
+#
+#     for t in perturbation_times:
+#         if not any(np.isclose(t, tspan)):
+#             raise ValueError('Perturbation time %f is not defined in tspan'
+#                              % t)
+#
+#     # Create the tspans for each simulation stage
+#     tspans = np.split(tspan, [np.abs(tspan-value).argmin() for value in
+#                               perturbation_times])
+#     for i in range(len(tspans) - 1):
+#         tspans[i] = np.append(tspans[i], tspans[i + 1][0])
+#
+#     # Do an initial simulation with the above setup until the point at which
+#     # we want to change a parameter (perturbation_time)
+#     res = sim.run(tspan=tspans[0])
+#
+#     df_out = res.dataframe
+#
+#     for i, t in enumerate(perturbation_times, 1):
+#         res = sim.run(initials=res.species[-1],
+#                       param_values=perturbation_params[t],
+#                       tspan=tspans[i])
+#
+#         df_out = pd.concat([df_out, res.dataframe.iloc[1:]])
+#
+#     return df_out
 
 
 Model ()
@@ -73,7 +73,7 @@ Observable('Rp_obs', R(e = None, state = 'phos'))
 
 
 
-perturbation_params = {1: {'S_0': 0.3}}
+# perturbation_params = {1: {'S_0': 0.3}}
 
 
 Parameter('km', 1.0)
@@ -140,38 +140,17 @@ Rule('rbp_deg', R(e = None, state = 'phos') >> None, dRP)
 Rule('rb32f_deg', E(r = 1)%R(e = 1, state = 'unmod') >> None, dRE)
 
 tspan = np.linspace(0, 3000, 30001)
-sim = ScipyOdeSimulator(model)
-# simulation_result = sim.run()
+sim = ScipyOdeSimulator(model, tspan = tspan)
+simulation_result = sim.run()
 
-df = run_sim_with_perturbations(sim, tspan, perturbation_params)
+# df = run_sim_with_perturbations(sim, tspan, perturbation_params)
 
-print(model.species)
-
-plt.figure(figsize= (15,5))
-plt.subplot(121)
-plt.plot(tspan/60, df['__s4'], label = 'CycD')
-# plt.plot(tspan, simulation_result.observables['y_obs'], label = 'y')
-plt.xlabel("time(hours)", fontsize=16)
-plt.ylabel("Concentration uM", fontsize=16)
-# plt.ylim(ymin = -2)
-# plt.xlim(xmin = -2)
-plt.legend(loc=0)
-# plt.show()
-
-# plt.figure()
-plt.subplot(122)
-plt.plot(tspan/60, df['__s5'], label = 'E2F')
-# plt.plot(tspan, simulation_result.observables['y_obs'], label = 'y')
-plt.xlabel("time(hours)", fontsize=16)
-plt.ylabel("Concentration uM", fontsize=16)
-# plt.ylim(ymin = -10, ymax =100)
-plt.legend(loc=0)
-plt.show()
-
+for i,sp in enumerate(model.species):
+    print i,":",sp
 
 # plt.figure(figsize= (15,5))
 # plt.subplot(121)
-# plt.plot(tspan/60, simulation_result.observables['E_obs'], label = 'E2F')
+# plt.plot(tspan/60, df['__s4'], label = 'CycD')
 # # plt.plot(tspan, simulation_result.observables['y_obs'], label = 'y')
 # plt.xlabel("time(hours)", fontsize=16)
 # plt.ylabel("Concentration uM", fontsize=16)
@@ -182,10 +161,32 @@ plt.show()
 #
 # # plt.figure()
 # plt.subplot(122)
-# plt.plot(tspan/60, simulation_result.observables['CD_obs'], label = 'CycD')
+# plt.plot(tspan/60, df['__s5'], label = 'E2F')
 # # plt.plot(tspan, simulation_result.observables['y_obs'], label = 'y')
 # plt.xlabel("time(hours)", fontsize=16)
 # plt.ylabel("Concentration uM", fontsize=16)
 # # plt.ylim(ymin = -10, ymax =100)
 # plt.legend(loc=0)
 # plt.show()
+
+
+plt.figure(figsize= (15,5))
+plt.subplot(121)
+plt.plot(tspan/60, simulation_result.observables['E_obs'], label = 'E2F')
+# plt.plot(tspan, simulation_result.observables['y_obs'], label = 'y')
+plt.xlabel("time(hours)", fontsize=16)
+plt.ylabel("Concentration uM", fontsize=16)
+# plt.ylim(ymin = -2)
+# plt.xlim(xmin = -2)
+plt.legend(loc=0)
+# plt.show()
+
+# plt.figure()
+plt.subplot(122)
+plt.plot(tspan/60, simulation_result.observables['CD_obs'], label = 'CycD')
+# plt.plot(tspan, simulation_result.observables['y_obs'], label = 'y')
+plt.xlabel("time(hours)", fontsize=16)
+plt.ylabel("Concentration uM", fontsize=16)
+# plt.ylim(ymin = -10, ymax =100)
+plt.legend(loc=0)
+plt.show()

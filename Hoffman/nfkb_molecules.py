@@ -713,6 +713,10 @@ tspan = np.linspace(0, 120, 121)
 # print(tspan)
 sim = ScipyOdeSimulator(model, tspan = tspan)
 simulation_result = sim.run()
+
+
+
+
 # df = run_sim_with_perturbations(sim, tspan, perturbation_params)
 # print(df.shape)
 # print(len(df['__s21']))
@@ -795,4 +799,4 @@ plt.ylabel("Concentration", fontsize=10)
 plt.legend(loc=0)
 
 plt.tight_layout()
-plt.show()
+# plt.show()

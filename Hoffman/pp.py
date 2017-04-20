@@ -32,25 +32,29 @@ Observable('x_obs', X())
 Observable('y_obs', Y())
 
 tspan = np.linspace(0,100,1001)
-w = odesolve(model, tspan,verbose=True)
+sim = ScipyOdeSimulator(model, tspan = tspan)
+sim_result = sim.run()
+print(sim_result.dataframe)
+
+# w = odesolve(model, tspan,verbose=True)
 #
 # print(w['x_obs'])
-# print()
+# print()z
 # print(w['y_obs'])
 
-
-
-plt.figure()
-plt.plot(tspan, w['x_obs'], lw = 2, color = 'b',label = 'x')
-plt.plot(tspan, w['y_obs'],lw = 2, color = 'r',label = 'y')
-plt.legend(loc = 0)
-
-
-plt.figure()
-plt.plot(w['y_obs'], w['x_obs'], lw = 2)
-# plt.plot(w['x_obs'], w['y_obs'], lw = 2, color = 'r')
-plt.xlim(xmax = 5, xmin = 0)
-plt.ylim(ymax = 3.5, ymin =0)
-plt.xlabel('y obs')
-plt.ylabel('x obs')
-plt.show()
+#
+#
+# plt.figure()
+# plt.plot(tspan, w['x_obs'], lw = 2, color = 'b',label = 'x')
+# plt.plot(tspan, w['y_obs'],lw = 2, color = 'r',label = 'y')
+# plt.legend(loc = 0)
+#
+#
+# plt.figure()
+# plt.plot(w['y_obs'], w['x_obs'], lw = 2)
+# # plt.plot(w['x_obs'], w['y_obs'], lw = 2, color = 'r')
+# plt.xlim(xmax = 5, xmin = 0)
+# plt.ylim(ymax = 3.5, ymin =0)
+# plt.xlabel('y obs')
+# plt.ylabel('x obs')
+# plt.show()

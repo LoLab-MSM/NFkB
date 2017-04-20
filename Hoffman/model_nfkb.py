@@ -34,7 +34,7 @@ Monomer('IkBe_mRNA')
 # def ikbd_and_mRNA_monomers():
 Monomer('IkBd', ['nfkb', 'S'], {'S': ['C', 'N']})
 Monomer('IkBd_mRNA')
-
+Monomer('gene', ['type','state'], {'type': ['a', 'b', 'e', 'd'],'state':['off', 'on']})
 
 # Declares NFkB, IKK1, and IKK2 which having a binding site to IkB and NFkB can transport between the Cytoplasm
 # and the Nucleus. IKK1 and IKK2 only exist in the Cytoplasm.
@@ -201,8 +201,17 @@ Initial(A20(), a20_0)
 Parameter('a20t_0', 0.0001) #TRADD-TRAF-RIP
 Initial(A20t(), a20t_0)
 
-# Parameter('TNF_0', 0.2)
-# Initial(TNF(c = None, tnfr = None), TNF_0)
+Parameter('genea_0', 0.012)
+Initial(gene(type = 'a', state = 'off'), genea_0)
+
+Parameter('geneb_0', 0.012)
+Initial(gene(type = 'b', state = 'off'), geneb_0)
+
+Parameter('genee_0', 0.012)
+Initial(gene(type = 'e', state = 'off'), genee_0)
+
+Parameter('gened_0', 0.012)
+Initial(gene(type = 'd', state = 'off'), gened_0)
 
 
 
@@ -223,6 +232,16 @@ Rule('d_synth', None >> IkBd_mRNA(), psynth_d)
 # Rule('d_synth', NFkB(ikb=None, S='N') >> IkBd_mRNA() + NFkB(ikb=None, S='N'), psynth_d)
 
 
+Parameter('a_delay', 0.1)
+Parameter('be_delay', 0.027)
+Parameter('d_delay', 0.011)
+
+Rule('genea_off_on', gene(type = 'a', state = 'off') >> gene(type = 'a',state = 'on'), a_delay)
+Rule('geneb_off_on', gene(type = 'b', state = 'off') >> gene(type = 'b',state = 'on'), be_delay)
+Rule('genee_off_on', gene(type = 'e', state = 'off') >> gene(type = 'e',state = 'on'), be_delay)
+Rule('gened_off_on', gene(type = 'd', state = 'off') >> gene(type = 'd',state = 'on'), d_delay)
+
+
 Parameter('hill', 3)
 Parameter('a', 8)
 Parameter('b', 0.02)
@@ -236,10 +255,11 @@ Expression('b_NFkBn', b*(NFkBn_free)**(hill))
 Expression('e_NFkBn', e*(NFkBn_free)**(hill))
 Expression('d_NFkBn', d*(NFkBn_free)**(hill))
 
-Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
-Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
-Rule('en_mRNA', None >> IkBe_mRNA(), e_NFkBn)
-Rule('dn_mRNA', None >> IkBd_mRNA(), d_NFkBn)
+Rule('an_mRNA', gene(type = 'a',state = 'on') >> IkBa_mRNA() + gene(type = 'a',state = 'on'), a_NFkBn)
+Rule('bn_mRNA', gene(type = 'b',state = 'on') >> IkBb_mRNA() + gene(type = 'b',state = 'on'), a_NFkBn)
+Rule('en_mRNA', gene(type = 'e',state = 'on') >> IkBe_mRNA() + gene(type = 'e',state = 'on'), a_NFkBn)
+Rule('dn_mRNA', gene(type = 'd',state = 'on') >> IkBd_mRNA() + gene(type = 'd',state = 'on'), a_NFkBn)
+
 
 # Rule('an_mRNA', None >> IkBa_mRNA(), a_NFkBn)
 # Rule('bn_mRNA', None >> IkBb_mRNA(), b_NFkBn)
@@ -742,14 +762,14 @@ simulation_result = sim.run()
 # print(len(df['__s21']))
 # print(df['__s21'])
 
-for  j,ode in enumerate(model.odes):
-    for i in range(len(model.species)):
-       ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
-    print j,":",ode
+# for  j,ode in enumerate(model.odes):
+#     for i in range(len(model.species)):
+#        ode = re.sub(r'\b__s%d\b'%i, species_dict[i], str(ode))
+#     print j,":",ode
 
 
-print(model.parameters)
-print(len(model.reactions))
+# print(model.parameters)
+# print(len(model.reactions))
 #
 # plt.figure()
 # plt.plot(tspan/60, df['__s21'], label = 'NFkBn_obs')
