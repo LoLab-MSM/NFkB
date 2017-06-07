@@ -688,6 +688,10 @@ Rule('IKKai_IKKi', IKK(state = 'ai') >> IKK(state = 'i'), IKKai_f_IKKi)
 
 #Dictionary to substitute in species names to match matlab files
 # def species_dict():
+
+for i,sp in enumerate(model.species):
+    print i,":",sp
+
 species_dict = {
     0: 'IkBa',
     1: 'IkBan',

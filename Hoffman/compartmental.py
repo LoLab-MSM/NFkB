@@ -6,7 +6,7 @@ from __future__ import print_function
 from pysb import *
 import numpy as np
 from pysb.simulator import ScipyOdeSimulator
-from pysb.logging import setup_logger
+# from pysb.logging import setup_logger
 from pysb.core import *
 import matplotlib.pyplot as plt
 
@@ -29,7 +29,7 @@ Compartment('V', M, 3, V3D)
 # A and B, both embedded in Parent compartment, bind reversibly and release A
 Parameter('Kab_f', 1)
 Parameter('Kab_r', 1)
-Rule('AP_bind_BP', A(b=None) ** P + B(a=None) ** P <> A(b=1) ** P % B(a=1) ** P,
+Rule('AP_bind_BP', A(b=None) ** P + B(a=None) ** V <> A(b=1) **M  % B(a=1) ** M,
      Kab_f, Kab_r)
 Rule('ABP_unbind_AP',A(b=1) ** P % B(a=1) ** P >> A(b=None) ** P,
      Kab_f)
@@ -45,6 +45,7 @@ Rule('A1_A2', A(b=ANY) ** P <> A(b=ANY) ** M,
      Ktrans_f, Ktrans_r, move_connected=True)
 Rule('A2_A3', A(b=ANY) ** M >> A(b=ANY) ** V,
      Ktrans_v,move_connected=True)
+Rule('A_deg', A(b = None)**P >> None, Ktrans_v)
 
 # A and B bind and unbind, and release A in the 3D volume
 Parameter('Vab_f', 1)
