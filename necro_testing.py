@@ -223,37 +223,79 @@ Observable('C8i_obs', C8(state = 'I'))
 Observable('C8a_obs', C8(state = 'A'))
 Observable('flip_obs', flip_L())
 
-# params = [1.96000000e-02,   1.00000000e-02,   8.30000000e-04,   4.00000000e-02,
-#   8.30000000e-04,   8.30000000e-04,   4.90000000e-03,   4.00000000e-03,
-#   3.30000000e-03,   4.00000000e-03,   3.00000000e-03,   1.00000000e-02,
-#   4.00000000e-03,   1.00000000e-01,   3.40000000e-03, 2.39392755e+04,
-#   2.53475553e+03,   5.22177085e+05,   2.13502358e-06,   5.46940120e+02,
-#   1.55142024e+01,   1.62795932e-01,   2.34916126e+00,   3.11329945e-02,
-#   4.18939575e+00,   1.52866551e-03, 1.00000000e+02,   7.50000000e-01,
-#   1.00000000e+02,   7.50000000e-01,   3.00000000e+01,   1.81309729e+03,
-#   1.49833288e+03,   2.71733457e-05,   4.25601259e-02,   6.79626080e+04,
-#   4.09541943e-09,   1.97652813e-02,   1.91415869e+04,   3.18898779e+00,
-#   3.70535490e-03,   1.14735101e+01,   2.21956403e-02,   3.02916954e+01,
-#   9.89552029e+01,   1.57129903e-02,  2.11223691e+03,   1.13196524e-05,
-#   30.0,   3.00000000e+01,   7.50000000e-01,   7.50000000e-01,
-#   1.00000000e+00]
+params = [1.96000000e-05,   1.00000000e-02,   0.00246,   4.580000000e-03,
+  0.0264,   8.30000000e-04,   0.0001,   0.0001,
+  0.04,   4.00000000e-02,   3.00000000e-03,   1.00000000e-02,
+  4.00000000e-03,   1.00000000e-01,   0.0005,
+5.22E+05,
+2.14E-06,
+5.47E+02,
+1.55E+01,
+1.63E-01,
+2.35E+00,
+3.11E-02,
+4.19E+00,
+1.53E-03,
+4.19E+00,
+1.53E-03,
+1.81E+03,
+4.19E+00,
+1.53E-03,
+1.50E+03,
+2.72E-05,
+4.26E-02,
+6.80E+04,
+4.10E-09,
+4.26E-02,
+2.39E+04,
+2.53E+03,
+1.98E-02,
+1.91E+04,
+3.19E+00,
+3.71E-03,
+3.19E+00,
+1.15E+01,
+2.22E-02,
+3.03E+01,
+9.90E+01,
+1.57E-02,
+2.11E+03,
+1.13E-05,
+1.17E+04,
+1.00000000e+00]
+
+
 #1.16684919e+04
 
 # model.parameters_rules = params
 # print(model.parameters)
 
 # mlklnum = list(np.linspace(0.009, 0.1, num = 10))
-mlklnum = list(np.linspace(0.0001, 0.0009, num = 100))
-c8num = list(np.linspace(0.00087, 0.0307, 25))
-# c8num = list(np.linspace(0.003, 0.033, 10))
+rip1num = list(np.linspace(0.002, 0.006, 20))
+mlklnum = list(np.linspace(0.00001, 0.0005, num = 20))
+c8num = list(np.linspace(0.00087, 0.9, 20))
+flipnum = list(np.linspace(0.000087, 0.09, 20))
+faddnum = list(np.linspace(0.01, 0.07, 20))
 tspan = np.linspace(0, 1440, 1441)
+
 sim = ScipyOdeSimulator(model, tspan)
 # sim_result = sim.run()
 
 
 
-sim_result = sim.run(initials = {flip_L(bDED=None, state = 'A'): c8num})
+# sim_result = sim.run(initials = {RIP1(bscf=None, btraf=None, bub1=None, bub2=None, bub3=None, bDD = None, bRHIM = None, bMLKL = None, state='unmod'): rip1num, C8(bf=None, flip = None, state='A'): c8num, flip_L(bDED=None, state = 'A'): flipnum}, param_values=params)
+sim_result = sim.run(initials = {FADD(bDD=None, bDED1=None, bDED2=None): faddnum}, param_values=params)
 sim_df = sim_result.dataframe
+
+for n in range(0,20):
+    plt.plot(tspan/60, sim_df.loc[n]['MLKLa_obs'].iloc[:], lw =1)
+plt.xlabel('Time in Hr', fontsize=16)
+plt.ylabel('MLKL uM Concentration', fontsize=16)
+plt.title('TNF:0.1 ng/ml')
+plt.legend(faddnum, title = 'Fadd', loc='best', fontsize = 5)
+plt.show()
+quit()
+
 # print(sim_df)
 # print(model.parameters)
 # print(type(model.parameters_rules().values))
@@ -280,17 +322,6 @@ sim_df = sim_result.dataframe
 # print(sim_df[1]['MLKLa_obs'].iloc[:])
 # quit()
 
-
-
-
-for n in range(0,25):
-    plt.plot(tspan/60, sim_df.loc[n]['MLKLa_obs'].iloc[:], lw =0.5)
-plt.xlabel('Time in Hr', fontsize=16)
-plt.ylabel('MLKL uM Concentration', fontsize=16)
-plt.title('TNF:100 ng/ml')
-# plt.legend(c8num, title = 'c8', loc='best', fontsize = 10)
-plt.show()
-quit()
 
 sim1 = ScipyOdeSimulator(model, tspan)
 sim2 =ScipyOdeSimulator(model, tspan)
