@@ -10,7 +10,7 @@ from scipy.interpolate import *
 import scipy.interpolate
 import numpy as np
 from pysb.simulator.bng import BngSimulator
-from nfkb_complex import model
+from nfkb_marco import model
 
 tspan = np.linspace(0, 720, 721)
 sim = BngSimulator(model, tspan = tspan)

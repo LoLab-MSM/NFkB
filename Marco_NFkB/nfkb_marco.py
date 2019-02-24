@@ -261,9 +261,9 @@ Parameter('b_f_deg', 0.12/.1)
 Parameter('e_f_deg', 0.18/.1)
 Parameter('d_f_deg', 0.18*.01)
 
-Parameter('and_c_n', 0.36)
-Parameter('bnd_c_n', 0.12)
-Parameter('end_c_n', 0.18)
+# Parameter('and_c_n', 0.36)
+# Parameter('bnd_c_n', 0.12)
+# Parameter('end_c_n', 0.18)
 Parameter('dnd_c_n', 0.18*.01)
 
 Observable('IKKa_obs', IKK(state = 'a'))
@@ -285,7 +285,7 @@ Rule('dn_c_n', IkBd(nfkb=1, S='C')%NFkB(ikb=1, S='C') >> NFkB(ikb=None, S='C'), 
 Parameter('A20_mRNA', 2e-6)
 Parameter('A20n', 0.4)
 Parameter('A20_mRNA_c_deg', 0.035)
-Parameter('a1d_c_deg', 0.36)
+# Parameter('a1d_c_deg', 0.36)
 Parameter('A20_synth', 0.25)
 Parameter('A20_deg', 0.0029)
 
