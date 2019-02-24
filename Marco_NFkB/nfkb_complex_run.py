@@ -16,6 +16,7 @@ tspan = np.linspace(0, 720, 721)
 sim = BngSimulator(model, tspan = tspan)
 simulation_result = sim.run(method='ode')
 
+
 plt.figure(figsize = (15,10))
 # plt.figure()
 plt.subplot(231)
